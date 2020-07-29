@@ -17,6 +17,7 @@ public abstract class Board {
     abstract public int getMaxY();
     abstract public Figure moveFigure(Move move);
     abstract public Figure captureFigure(Figure captured);
+    abstract public boolean hasPos(Position pos);
 }
 
 class DraughtsBoard extends Board {
@@ -99,7 +100,13 @@ class DraughtsBoard extends Board {
             return board.remove(captured.getPos());
         else return null;
     }
-    
+
+    @Override
+    public boolean hasPos(Position pos) {
+        if(pos.x<=this.maxX && pos.y<=this.maxY && pos.x>0 && pos.y>0) return true;
+        else return false;
+    }
+
     private class BoardPanel extends JPanel {
         
         int offsetX;

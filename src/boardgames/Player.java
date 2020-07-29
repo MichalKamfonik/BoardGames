@@ -5,6 +5,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.util.LinkedList;
+import java.util.List;
 import javax.swing.GroupLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -32,7 +33,7 @@ class User extends Player {
     private Figure picked = null;
     private Position oldPos = null;
     private boolean myTurn = false;
-    private LinkedList<Move> moves;
+    private List<Move> moves;
     private Move nextMove;
     protected Board currentBoard;
     
