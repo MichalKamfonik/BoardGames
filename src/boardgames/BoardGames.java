@@ -16,26 +16,29 @@ import javax.swing.border.EtchedBorder;
  * @version 0.1 29-05-2020
  */
 public class BoardGames extends JFrame {
-    /** 
+    /**
      * Default Height of the window
      */
     private static final int Frame_H = 600;
-    /** 
+    /**
      * Default Width of the window
      */
     private static final int Frame_W = 800;
-    
     /**
      * Content Pane reference
      */
     private Container contentPane = this.getContentPane();
-    
+    /**
+     * Chosen Board game
+     */
     private Board chosenBoard = new DraughtsBoard(8,8);
     /**
      * Panel for showing The Board
      */
     private JPanel pBoard = chosenBoard.getJPanel();
-    
+    /**
+     * Array of players in the game
+     */
     private Player[] players = new Player[2];
     /**
      * Panel for showing Player One
@@ -67,7 +70,6 @@ public class BoardGames extends JFrame {
                 .addComponent(pPlayer2)
         );
     }
-    
     /**
      * Panel for displaying player information
      */
