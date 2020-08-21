@@ -10,7 +10,7 @@ import javax.swing.JPanel;
 
 public abstract class Board {
     abstract public Figure getFigure(Position pos);
-    abstract public Map<Position, Figure> getMap();
+//    abstract public Map<Position, Figure> getMap();
     abstract public void putFigure(Figure fig);
     abstract public JPanel getJPanel();
     abstract public int getMaxX();
@@ -25,7 +25,7 @@ class DraughtsBoard extends Board {
     private final int maxX;
     private final int maxY;
     
-    private Map<Position, Figure> board = new TreeMap<Position, Figure>();
+    private final Map<Position, Figure> board = new TreeMap<>();
     
     private final Image imageWhite = new ImageIcon("whiteSpot.png").getImage();
     private final Image imageBlack = new ImageIcon("blackSpot.png").getImage();
@@ -50,24 +50,23 @@ class DraughtsBoard extends Board {
     
     private void initializeBoard()
     {
-        for(int y=1;y<=maxY;y++) {
+        initializeTeam(1,3,1);
+        initializeTeam(maxY-2,maxY,-1);
+    }
+
+    private void initializeTeam(int rowMin, int rowMax, int team) {
+        for(int y=rowMin;y<=rowMax;y++) {
             for(int x=((y+1)%2)+1; x<=maxX;x+=2) {
-                if(y<=3 || y>=maxY-2) {
-                    Position tmp = new Position(x,y);
-                    int team;
-                    if(y<4)
-                        team = 1;
-                    else team = -1;
-                    board.put(tmp, new DraughtsMan(tmp,team));
-                }
+                Position tmp = new Position(x,y);
+                board.put(tmp, new DraughtsMan(tmp,team));
             }
         }
     }
     
-    @Override
-    public Map<Position, Figure> getMap() {
-        return board;
-    }
+//    @Override
+//    public Map<Position, Figure> getMap() {
+//        return board;
+//    }
 
     @Override
     public JPanel getJPanel() {
@@ -103,15 +102,13 @@ class DraughtsBoard extends Board {
 
     @Override
     public boolean hasPos(Position pos) {
-        if(pos.x<=this.maxX && pos.y<=this.maxY && pos.x>0 && pos.y>0) return true;
-        else return false;
+        return pos.x<=this.maxX && pos.y<=this.maxY && pos.x>0 && pos.y>0;
     }
 
     private class BoardPanel extends JPanel {
         
         int offsetX;
         int offsetY;
-        boolean picked = false;
         
         @Override
         public void paintComponent(Graphics g) {
@@ -129,9 +126,7 @@ class DraughtsBoard extends Board {
                 }
             }
             try{
-            board.forEach((pos, fig) -> {
-                g.drawImage(fig.getImage(),offsetX+(fig.getPos().x-1)*30,offsetY+(maxY-fig.getPos().y)*30,null);
-            });
+                board.forEach((pos, fig) -> g.drawImage(fig.getImage(),offsetX+(fig.getPos().x-1)*30,offsetY+(maxY-fig.getPos().y)*30,null));
             }
             catch(ConcurrentModificationException e) {
                 System.out.println("Zignorowano wyjątek");
