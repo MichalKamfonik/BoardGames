@@ -9,13 +9,11 @@ import javax.swing.JPanel;
 public abstract class Board {
     abstract public Figure getFigure(Position pos);
     abstract public Field getField(Position pos);
-    abstract public Map<Position, Figure> getFigures();
     abstract public void putFigure(Figure fig);
     abstract public JPanel getJPanel();
     abstract public int getMaxX();
     abstract public int getMaxY();
     abstract public Figure moveFigure(Move move);
-    abstract public Figure captureFigure(Figure captured);
     abstract public boolean hasPos(Position pos);
 }
 
@@ -27,7 +25,7 @@ class DraughtsBoard extends Board {
     private final Map<Position, Figure> figures = new TreeMap<>();
     private final Field[][] fields;
     
-    private final JPanel panel = new BoardPanel();
+    private final JPanel panel = new BoardPanel(); // to be deleted
     
     public DraughtsBoard(int maxX, int maxY) {
         this.maxX = maxX;
@@ -78,11 +76,6 @@ class DraughtsBoard extends Board {
             }
         }
     }
-    
-    @Override
-    public Map<Position, Figure> getFigures() {
-        return figures;
-    }
 
     @Override
     public JPanel getJPanel() {
@@ -109,8 +102,7 @@ class DraughtsBoard extends Board {
         return captureFigure(move.captured);
     }
 
-    @Override
-    public Figure captureFigure(Figure captured) {
+    private Figure captureFigure(Figure captured) {
         if(captured != null)
             return figures.remove(captured.getPos());
         else return null;
