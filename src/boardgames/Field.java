@@ -4,10 +4,10 @@ import javax.swing.*;
 import java.awt.*;
 
 public class Field {
-    static final int WHITE = 0;
-    static final int BLACK = 1;
-    private final Image imageWhite = new ImageIcon("whiteSpot.png").getImage();
-    private final Image imageBlack = new ImageIcon("blackSpot.png").getImage();
+    public static final int WHITE = 0;
+    public static final int BLACK = 1;
+    private static final Image imageWhite = new ImageIcon("whiteSpot.png").getImage();
+    private static final Image imageBlack = new ImageIcon("blackSpot.png").getImage();
 
     final int color;
 

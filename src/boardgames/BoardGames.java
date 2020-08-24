@@ -81,7 +81,7 @@ public class BoardGames extends JFrame {
         private JPanel removedPanel = new JPanel();
         private JLabel nameLabel = new JLabel();
         
-        private Player[] availablePlayers = new Player[1];                      // tutaj dodawaj możliwych graczy(algorytmy/userow...)
+        private Player[] availablePlayers = new Player[2];                      // tutaj dodawaj możliwych graczy(algorytmy/userow...)
         
         private JComboBox<Player> playerCombBox = new JComboBox<>(availablePlayers);
         
@@ -112,7 +112,8 @@ public class BoardGames extends JFrame {
             
             int direction = 3-2*number;
             
-            players[number-1] = new User(pBoard,direction);                     // skasować
+            if(number == 1) players[number-1] = new User(pBoard,direction); // to be deleted
+            if(number == 2) players[number-1] = new MinMax(pBoard,direction); // to be deleted
             
             infoPanel = players[number-1].getJPanel();                          // to be changed
             removedPanel.add(new JLabel("",JLabel.CENTER));                     // to be changed

@@ -10,7 +10,7 @@ public abstract class Board {
     abstract public Figure getFigure(Position pos);
     abstract public Field getField(Position pos);
     abstract public void putFigure(Figure fig);
-    abstract public JPanel getJPanel();
+    abstract public JPanel getJPanel(); // to be moved outside?
     abstract public int getMaxX();
     abstract public int getMaxY();
     abstract public Figure moveFigure(Move move);
@@ -25,7 +25,7 @@ class DraughtsBoard extends Board {
     private final Map<Position, Figure> figures = new TreeMap<>();
     private final Field[][] fields;
     
-    private final JPanel panel = new BoardPanel(); // to be deleted
+    private final JPanel panel = new BoardPanel(); // to be deleted?
     
     public DraughtsBoard(int maxX, int maxY) {
         this.maxX = maxX;
@@ -78,7 +78,7 @@ class DraughtsBoard extends Board {
     }
 
     @Override
-    public JPanel getJPanel() {
+    public JPanel getJPanel() { // to be deleted
         return panel;
     }
 
@@ -96,16 +96,16 @@ class DraughtsBoard extends Board {
     public Figure moveFigure(Move move) {
         Figure moved = figures.remove(move.from);
         
-        figures.put(move.to, moved);
-        figures.get(move.to).moveTo(move.to);
-        panel.repaint();
+        figures.put(move.to, moved); // Map moved-figure correctly
+        figures.get(move.to).moveTo(move.to); // Update position in moved-figure
+        panel.repaint();    // to be deleted
         return captureFigure(move.captured);
     }
 
     private Figure captureFigure(Figure captured) {
-        if(captured != null)
+        if(captured != null) {
             return figures.remove(captured.getPos());
-        else return null;
+        } else return null;
     }
 
     @Override
@@ -113,7 +113,7 @@ class DraughtsBoard extends Board {
         return pos.x<=this.maxX && pos.y<=this.maxY && pos.x>0 && pos.y>0;
     }
 
-    private class BoardPanel extends JPanel {
+    private class BoardPanel extends JPanel { // to be removed?
         
         int offsetX;
         int offsetY;
@@ -135,7 +135,7 @@ class DraughtsBoard extends Board {
                 figures.forEach((pos, fig) -> g.drawImage(fig.getImage(),offsetX+(fig.getPos().x-1)*30,offsetY+(maxY-fig.getPos().y)*30,null));
             }
             catch(ConcurrentModificationException e) {
-                System.out.println("ConcurrentModificationException ignored");
+                e.printStackTrace();
             }
         }
     }

@@ -8,73 +8,79 @@ public abstract class Game implements Runnable {
 }
 
 class Draughts extends Game {
-    
-    boolean isOver = false;
+    int[] KingsNoCapture;
 
     public Draughts(Player[] players, Board board) {
         this.board = board;
         this.players = players;
+        KingsNoCapture = new int[players.length];
     }
     
     @Override
     public void run() {
         int round = 0;
-        Move move;
-        int[] KingsNoCapture = new int[players.length];
         
-        while(!isOver) {
+        while(true) {
             int team = round%players.length;
             round ++;
-            
-            move = players[team].getMove(this.board);
+            Move move = players[team].getMove(this.board);
+
             if(move == null) {
-                isOver = true;
-                JOptionPane.showMessageDialog(null,"Zwycięża " + players[round%players.length].getName());
+                JOptionPane.showMessageDialog(null,"The winner is: " + players[round%players.length].getName());
+                break;
             }
-            else {
-                while(capturePossible(players[team].team) && move.captured==null) {
-                    JOptionPane.showMessageDialog(null,"Bicie jest obowiązkowe");
-                    move = players[team].getMove(this.board);
-                }
-                board.moveFigure(move);
-                Figure moved = board.getFigure(move.to);
-                
-                if(move.captured!=null) {
-                    KingsNoCapture[team]=0;
-                    
-                    while(capturePossible(moved)) {
-                        move = players[team].getMove(this.board);
-                        if(move.from.equals(moved.getPos()) && move.captured != null)
-                            board.moveFigure(move);
-                        else
-                            JOptionPane.showMessageDialog(null,"Należy kontynuować bicie");
-                    }
-                }
-                else if(board.getFigure(move.to) instanceof DraughtsKing) {
-                    KingsNoCapture[team]++;
-                    isOver = true;
-                    for(int i: KingsNoCapture) {
-                        if(i < 15) {
-                            isOver = false;
-                            break;
-                        }
-                    }
-                    if(isOver)
-                        JOptionPane.showMessageDialog(null,"Remis");
-                }
-                else
-                    KingsNoCapture[team]=0;
-                
-                if(moved instanceof DraughtsMan
-                        && ((moved.getTeam() == 1 && move.to.y == board.getMaxY())
-                        || (moved.getTeam() == -1 && move.to.y == 1))) {
-                    moved=new DraughtsKing(moved.getPos(), moved.getTeam());
-                    board.putFigure(moved);
-                    board.moveFigure(new Move(moved.getPos(),moved.getPos(),null));
-                }
+            while(capturePossible(players[team].team) && move.captured==null) {
+                JOptionPane.showMessageDialog(null,"Capture is obligatory");
+                move = players[team].getMove(this.board);
+            }
+            board.moveFigure(move);
+            Figure moved = board.getFigure(move.to);
+
+            if(move.captured!=null) {
+                KingsNoCapture[team]=0;
+                continueCapture(moved,team);
+            } else if(board.getFigure(move.to) instanceof DraughtsKing) {
+                KingsNoCapture[team]++;
+                if(tooManyKingsMove()) break;
+            } else {
+                KingsNoCapture[team] = 0;
+            }
+
+            if(checkPromote(moved)) {
+                promoteMan(moved);
             }
         }
         System.exit(0);
+    }
+
+    private void promoteMan(Figure moved){
+        moved=new DraughtsKing(moved.getPos(), moved.getTeam());
+        board.putFigure(moved);
+        board.moveFigure(new Move(moved.getPos(),moved.getPos(),null));
+    }
+
+    private boolean checkPromote(Figure moved) {
+        return moved instanceof DraughtsMan
+                && ((moved.getTeam() == 1 && moved.getPos().y == board.getMaxY())
+                || (moved.getTeam() == -1 && moved.getPos().y == 1));
+    }
+
+    private boolean tooManyKingsMove(){
+        for(int i: KingsNoCapture) {
+            if(i < 15) return false;
+        }
+        JOptionPane.showMessageDialog(null,"Draw");
+        return true;
+    }
+
+    private void continueCapture(Figure moved, int team){
+        while(capturePossible(moved)) {
+            Move move = players[team].getMove(this.board);
+            if(move.from.equals(moved.getPos()) && move.captured != null)
+                board.moveFigure(move);
+            else
+                JOptionPane.showMessageDialog(null,"Capture is obligatory");
+        }
     }
     
     private boolean capturePossible(Figure figure) {
@@ -99,5 +105,4 @@ class Draughts extends Game {
         }
         return false;
     }
-    
 }
