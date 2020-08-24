@@ -1,6 +1,7 @@
 package boardgames;
 
 import javax.swing.*;
+import java.util.LinkedList;
 import java.util.List;
 
 public class MinMax extends Player {
@@ -57,7 +58,42 @@ public class MinMax extends Player {
 
     @Override
     Move getMove(Board chosenBoard) {
-//        fdasdfdaadafds
+//        minimax();
         return null;
+    }
+
+    private int miniMax(Board board, int difficulty, int team){
+        List<Board> nodes = possibleMoves(board,team);
+        if(difficulty == 0 || nodes.isEmpty()){
+            return valueOfBoard(board);
+        }
+        int value;
+        if(team == this.team) {
+            value = Integer.MIN_VALUE;
+            for (Board node : nodes) {
+                int nodeValue = miniMax(node,difficulty-1,-team);
+                if(nodeValue > value) {
+                    value = nodeValue;
+                }
+            }
+        }
+        else{
+            value = Integer.MAX_VALUE;
+            for (Board node : nodes) {
+                int nodeValue = miniMax(node,difficulty-1,team);
+                if(nodeValue < value) {
+                    value = nodeValue;
+                }
+            }
+        }
+        return value;
+    }
+
+    private int valueOfBoard(Board board) {
+        return 0;
+    }
+
+    private List<Board> possibleMoves(Board board,int team){
+        return new LinkedList<Board>();
     }
 }
