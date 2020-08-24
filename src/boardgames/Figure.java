@@ -16,8 +16,8 @@ public abstract class Figure {
 }
 
 class Position implements Comparable<Position> {
-    public int x;
-    public int y;
+    int x;
+    int y;
     
     public Position(int x, int y) {
         this.x = x;
@@ -56,9 +56,9 @@ class Position implements Comparable<Position> {
 }
 
 class Move {
-    public Position from;
-    public Position to;
-    public Figure captured;
+    Position from;
+    Position to;
+    Figure captured;
     
     public Move(Position from, Position to, Figure captured) {
         this.from = new Position(from);
@@ -68,18 +68,19 @@ class Move {
     
     @Override
     public String toString() {
-        return "From "+from+" To "+ to+" Captured "+captured;
+        return "Move(From "+from+" To "+ to+" Captured "+captured;
     }
 }
 
 class DraughtsMan extends Figure {
     private static final String name = "Man";
-    private Position currentPos;
-    private final int team;
     private static final Image imageBlack=new ImageIcon("black.png").getImage();
     private static final Image imageWhite=new ImageIcon("white.png").getImage();
     private static final Image imageBlackPicked=new ImageIcon("blackP.png").getImage();
     private static final Image imageWhitePicked=new ImageIcon("whiteP.png").getImage();
+
+    private Position currentPos;
+    private final int team;
     
     private Image currentImage;
     
@@ -99,22 +100,22 @@ class DraughtsMan extends Figure {
     public List<Move> getMoves(Board currentBoard) {
         
         List<Move> moves = new LinkedList<>();
-        int[][] deltas = {{1,1},{1,-1},{-1,1},{-1,-1}};
+        int[][] directions = {{1,1},{1,-1},{-1,1},{-1,-1}}; //all movement directions
 
         for(int i=0; i<4; i++) {
             Position newPos = new Position(currentPos);
-            newPos.riseX(deltas[i][0]);
-            newPos.riseY(deltas[i][1]);
+            newPos.riseX(directions[i][0]);
+            newPos.riseY(directions[i][1]);
 
             if(currentBoard.hasPos(newPos)) {
                 if(currentBoard.getFigure(newPos) == null) {
-                    if (deltas[i][1] == team) {
+                    if (directions[i][1] == team) {
                         moves.add(new Move(currentPos, newPos, null));
                     }
                 } else if (currentBoard.getFigure(newPos).getTeam() != this.team) {
                     Figure captured = currentBoard.getFigure(newPos);
-                    newPos.riseX(deltas[i][0]);
-                    newPos.riseY(deltas[i][1]);
+                    newPos.riseX(directions[i][0]);
+                    newPos.riseY(directions[i][1]);
                     if (currentBoard.hasPos(newPos) && currentBoard.getFigure(newPos) == null) {
                         moves.add(new Move(currentPos, newPos, captured));
                     }
@@ -169,12 +170,13 @@ class DraughtsMan extends Figure {
 
 class DraughtsKing extends Figure{
     private static final String name = "King";
-    private Position currentPos;
-    private final int team;
     private static final Image imageBlack=new ImageIcon("blackKing.png").getImage();
     private static final Image imageWhite=new ImageIcon("whiteKing.png").getImage();
     private static final Image imageBlackPicked=new ImageIcon("blackKingP.png").getImage();
     private static final Image imageWhitePicked=new ImageIcon("whiteKingP.png").getImage();
+
+    private Position currentPos;
+    private final int team;
     
     private Image currentImage;
     
@@ -188,13 +190,13 @@ class DraughtsKing extends Figure{
     public List<Move> getMoves(Board currentBoard)
     {
         List<Move> moves = new LinkedList<>();
-        int[][] deltas = {{1,1},{1,-1},{-1,1},{-1,-1}};
+        int[][] directions = {{1,1},{1,-1},{-1,1},{-1,-1}}; //all move directions
 
         for(int i=0; i<4; i++) {
             Figure captured = null;
             Position newPos = new Position(this.currentPos);
-            newPos.riseX(deltas[i][0]);
-            newPos.riseY(deltas[i][1]);
+            newPos.riseX(directions[i][0]);
+            newPos.riseY(directions[i][1]);
 
             while(currentBoard.hasPos(newPos)) {
                 if(currentBoard.getFigure(newPos) == null) {
@@ -205,8 +207,8 @@ class DraughtsKing extends Figure{
                 } else {
                     break;
                 }
-                newPos.riseX(deltas[i][0]);
-                newPos.riseY(deltas[i][1]);
+                newPos.riseX(directions[i][0]);
+                newPos.riseY(directions[i][1]);
             }
         }
         return moves;
