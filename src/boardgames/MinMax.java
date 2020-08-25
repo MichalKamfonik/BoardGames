@@ -1,20 +1,15 @@
 package boardgames;
 
 import javax.swing.*;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class MinMax extends Player {
-    private final JPanel boardPanel;
-    private List<Move> moves;
-    private Board currentBoard;
 
-    public MinMax(JPanel boardPanel, int team) {
+    public MinMax(int team) {
         super();
         playerName = "MinMax";
         this.team = team;
         this.initPanel();
-        this.boardPanel = boardPanel;
     }
 
     private void initPanel() {
@@ -58,8 +53,24 @@ public class MinMax extends Player {
 
     @Override
     Move getMove(Board chosenBoard) {
-//        minimax();
-        return null;
+        List<Move> moves = getAllMoves(chosenBoard);
+        TreeMap<Integer,Move> nodes = new TreeMap<>();
+
+        for (Move move : moves) {
+            Board node = chosenBoard.deepClone();
+            node.moveFigure(move);
+            nodes.put(miniMax(node,1,team),move);
+        }
+        return nodes.lastEntry().getValue();
+    }
+
+    private List<Move> getAllMoves(Board chosenBoard) {
+        List<Move> moves = new LinkedList<>();
+
+        for (Figure figure : chosenBoard.getFigures(team)) {
+            moves.addAll(figure.getMoves(chosenBoard));
+        }
+        return moves;
     }
 
     private int miniMax(Board board, int difficulty, int team){
@@ -90,10 +101,33 @@ public class MinMax extends Player {
     }
 
     private int valueOfBoard(Board board) {
-        return 0;
+        int sum = 0;
+        List<Figure> myTeam = board.getFigures(team);
+        List<Figure> otherTeam = board.getFigures(-team);
+
+        if(myTeam.isEmpty()) return -100;
+        if(otherTeam.isEmpty()) return 100;
+
+        for (Figure figure : myTeam) {
+            sum+=figure.getValue();
+        }
+        for (Figure figure : otherTeam) {
+            sum-=figure.getValue();
+        }
+        return sum;
     }
 
     private List<Board> possibleMoves(Board board,int team){
-        return new LinkedList<Board>();
+        List<Board> nodes = new LinkedList<>();
+        if(board.getFigures(-team).isEmpty()) return nodes;
+
+        for (Figure figure : board.getFigures(team)) {
+            for (Move move : figure.getMoves(board)) {
+                Board node = board.deepClone();
+                node.moveFigure(move);
+                nodes.add(node);
+            }
+        }
+        return nodes;
     }
 }

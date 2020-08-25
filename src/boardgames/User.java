@@ -86,20 +86,13 @@ public class User extends Player {
     }
 
     private boolean movePossible() {
-        Position pos = new Position(1, 1);
-
-        for (int y = 1; y <= currentBoard.getMaxY(); y++) {
-            for (int x = 1; x <= currentBoard.getMaxX(); x++) {
-                if (currentBoard.getFigure(pos) != null
-                        && currentBoard.getFigure(pos).getTeam() == this.team
-                        && !currentBoard.getFigure(pos).getMoves(currentBoard).isEmpty()) {
-                    return true;
-                }
-                pos.riseX(1);
+        List<Figure> figures = currentBoard.getFigures(this.team);
+        for (Figure figure : figures) {
+            if(!figure.getMoves(currentBoard).isEmpty()) {
+                return true;
             }
-            pos.x = 1;
-            pos.riseY(1);
         }
+
         return false;
     }
 

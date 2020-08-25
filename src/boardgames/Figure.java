@@ -13,6 +13,8 @@ public abstract class Figure {
     abstract public void moveTo(Position newPos);
     abstract public void pick();
     abstract public void unpick();
+    abstract public Figure deepClone();
+    abstract public int getValue();
 }
 
 class Position implements Comparable<Position> {
@@ -78,6 +80,7 @@ class DraughtsMan extends Figure {
     private static final Image imageWhite=new ImageIcon("white.png").getImage();
     private static final Image imageBlackPicked=new ImageIcon("blackP.png").getImage();
     private static final Image imageWhitePicked=new ImageIcon("whiteP.png").getImage();
+    private static final int VALUE = 1;
 
     private Position currentPos;
     private final int team;
@@ -88,6 +91,16 @@ class DraughtsMan extends Figure {
         this.currentPos = pos;
         this.team = team;
         this.unpick();
+    }
+
+    @Override
+    public Figure deepClone(){
+        return new DraughtsMan(new Position(currentPos),this.team);
+    }
+
+    @Override
+    public int getValue(){
+        return VALUE;
     }
     
     /**
@@ -174,6 +187,7 @@ class DraughtsKing extends Figure{
     private static final Image imageWhite=new ImageIcon("whiteKing.png").getImage();
     private static final Image imageBlackPicked=new ImageIcon("blackKingP.png").getImage();
     private static final Image imageWhitePicked=new ImageIcon("whiteKingP.png").getImage();
+    private static final int VALUE = 5;
 
     private Position currentPos;
     private final int team;
@@ -184,6 +198,16 @@ class DraughtsKing extends Figure{
         this.currentPos = pos;
         this.team = team;
         this.unpick();
+    }
+
+    @Override
+    public Figure deepClone(){
+        return new DraughtsKing(new Position(currentPos),this.team);
+    }
+
+    @Override
+    public int getValue(){
+        return VALUE;
     }
     
     @Override

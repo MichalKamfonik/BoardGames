@@ -14,6 +14,9 @@ public class Field {
     public Field(int color) {
         this.color = color;
     }
+    public Field(Field other) {
+        this.color = other.color;
+    }
 
     public Image getImage(){
         if(color == WHITE) {

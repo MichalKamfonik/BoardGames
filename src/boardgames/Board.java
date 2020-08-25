@@ -1,9 +1,7 @@
 package boardgames;
 
 import java.awt.Graphics;
-import java.util.ConcurrentModificationException;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import javax.swing.JPanel;
 
 public abstract class Board {
@@ -15,6 +13,8 @@ public abstract class Board {
     abstract public int getMaxY();
     abstract public Figure moveFigure(Move move);
     abstract public boolean hasPos(Position pos);
+    abstract public List<Figure> getFigures(int team);
+    abstract public Board deepClone();
 }
 
 class DraughtsBoard extends Board {
@@ -32,6 +32,25 @@ class DraughtsBoard extends Board {
         this.maxY = maxY;
         fields = new Field[maxY][maxX];
         initializeBoard();
+    }
+
+    public DraughtsBoard(DraughtsBoard other) {
+        maxX = other.maxX;
+        maxY = other.maxY;
+        fields = new Field[maxY][maxX];
+
+        for (int i = 0; i<fields.length; i++){
+            for (int j = 0; j < fields[i].length; j++) {
+                fields[i][j] = new Field(other.fields[i][j]);
+            }
+        }
+
+        for (Figure figure : other.getFigures(1)) {
+            figures.put(new Position(figure.getPos()),figure.deepClone());
+        }
+        for (Figure figure : other.getFigures(-1)) {
+            figures.put(new Position(figure.getPos()),figure.deepClone());
+        }
     }
     
     @Override
@@ -111,6 +130,22 @@ class DraughtsBoard extends Board {
     @Override
     public boolean hasPos(Position pos) {
         return pos.x<=this.maxX && pos.y<=this.maxY && pos.x>0 && pos.y>0;
+    }
+
+    @Override
+    public List<Figure> getFigures(int team){
+        List<Figure> figures = new LinkedList<>();
+
+        this.figures.forEach((position, figure) -> {
+            if(figure.getTeam() == team)
+                figures.add(figure);
+        });
+
+        return figures;
+    }
+
+    public Board deepClone() {
+        return new DraughtsBoard(this);
     }
 
     private class BoardPanel extends JPanel { // to be removed?

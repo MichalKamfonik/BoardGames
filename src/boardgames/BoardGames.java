@@ -111,9 +111,10 @@ public class BoardGames extends JFrame {
             initSelectionPanel();
             
             int direction = 3-2*number;
-            
+
+//            players[number-1] = new User(pBoard,direction);
             if(number == 1) players[number-1] = new User(pBoard,direction); // to be deleted
-            if(number == 2) players[number-1] = new MinMax(pBoard,direction); // to be deleted
+            if(number == 2) players[number-1] = new MinMax(direction); // to be deleted
             
             infoPanel = players[number-1].getJPanel();                          // to be changed
             removedPanel.add(new JLabel("",JLabel.CENTER));                     // to be changed
