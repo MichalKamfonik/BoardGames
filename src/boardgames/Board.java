@@ -25,16 +25,17 @@ class DraughtsBoard extends Board {
     private final Map<Position, Figure> figures = new TreeMap<>();
     private final Field[][] fields;
     
-    private final JPanel panel = new BoardPanel(); // to be deleted?
+    private JPanel panel; // to be deleted?
     
     public DraughtsBoard(int maxX, int maxY) {
         this.maxX = maxX;
         this.maxY = maxY;
+        panel = new BoardPanel();
         fields = new Field[maxY][maxX];
         initializeBoard();
     }
 
-    public DraughtsBoard(DraughtsBoard other) {
+    private DraughtsBoard(DraughtsBoard other) {
         maxX = other.maxX;
         maxY = other.maxY;
         fields = new Field[maxY][maxX];
@@ -117,7 +118,9 @@ class DraughtsBoard extends Board {
         
         figures.put(move.to, moved); // Map moved-figure correctly
         figures.get(move.to).moveTo(move.to); // Update position in moved-figure
-        panel.repaint();    // to be deleted
+        if(panel!= null) {
+            panel.repaint();    // to be deleted
+        }
         return captureFigure(move.captured);
     }
 

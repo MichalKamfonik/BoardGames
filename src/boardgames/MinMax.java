@@ -59,7 +59,7 @@ public class MinMax extends Player {
         for (Move move : moves) {
             Board node = chosenBoard.deepClone();
             node.moveFigure(move);
-            nodes.put(miniMax(node,1,team),move);
+            nodes.put(miniMax(node,2,team),move);
         }
         return nodes.lastEntry().getValue();
     }
@@ -120,13 +120,24 @@ public class MinMax extends Player {
     private List<Board> possibleMoves(Board board,int team){
         List<Board> nodes = new LinkedList<>();
         if(board.getFigures(-team).isEmpty()) return nodes;
+        boolean capturePossible = false;    // trzeba sie zastanowic gdzie to przeniesc
 
         for (Figure figure : board.getFigures(team)) {
             for (Move move : figure.getMoves(board)) {
-                Board node = board.deepClone();
-                node.moveFigure(move);
-                nodes.add(node);
+                if(move.captured != null) {
+                    capturePossible = true;
+                    Board node = board.deepClone();
+                    node.moveFigure(move);
+                    nodes.add(node);
+                } else if(!capturePossible) {
+                    Board node = board.deepClone();
+                    node.moveFigure(move);
+                    nodes.add(node);
+                }
             }
+        }
+        if(capturePossible){
+            nodes.removeIf((node)->node.getFigures(-team).size() == board.getFigures(-team).size());
         }
         return nodes;
     }

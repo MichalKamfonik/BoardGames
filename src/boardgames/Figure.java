@@ -114,6 +114,7 @@ class DraughtsMan extends Figure {
         
         List<Move> moves = new LinkedList<>();
         int[][] directions = {{1,1},{1,-1},{-1,1},{-1,-1}}; //all movement directions
+        boolean capturePossible = false;
 
         for(int i=0; i<4; i++) {
             Position newPos = new Position(currentPos);
@@ -122,7 +123,7 @@ class DraughtsMan extends Figure {
 
             if(currentBoard.hasPos(newPos)) {
                 if(currentBoard.getFigure(newPos) == null) {
-                    if (directions[i][1] == team) {
+                    if (directions[i][1] == team && !capturePossible) {
                         moves.add(new Move(currentPos, newPos, null));
                     }
                 } else if (currentBoard.getFigure(newPos).getTeam() != this.team) {
@@ -131,9 +132,13 @@ class DraughtsMan extends Figure {
                     newPos.riseY(directions[i][1]);
                     if (currentBoard.hasPos(newPos) && currentBoard.getFigure(newPos) == null) {
                         moves.add(new Move(currentPos, newPos, captured));
+                        capturePossible = true;
                     }
                 }
             }
+        }
+        if(capturePossible){
+            moves.removeIf((move) -> move.captured==null);
         }
 
         return moves;
@@ -215,6 +220,7 @@ class DraughtsKing extends Figure{
     {
         List<Move> moves = new LinkedList<>();
         int[][] directions = {{1,1},{1,-1},{-1,1},{-1,-1}}; //all move directions
+        boolean capturePossible = false;
 
         for(int i=0; i<4; i++) {
             Figure captured = null;
@@ -224,7 +230,12 @@ class DraughtsKing extends Figure{
 
             while(currentBoard.hasPos(newPos)) {
                 if(currentBoard.getFigure(newPos) == null) {
-                    moves.add(new Move(currentPos, newPos, captured));
+                    if(captured != null) {
+                        capturePossible = true;
+                        moves.add(new Move(currentPos, newPos, captured));
+                    } else if(!capturePossible) {
+                        moves.add(new Move(currentPos, newPos, null));
+                    }
                 }
                 else if(currentBoard.getFigure(newPos).getTeam() != this.team && captured == null) {
                     captured = currentBoard.getFigure(newPos);
@@ -234,6 +245,9 @@ class DraughtsKing extends Figure{
                 newPos.riseX(directions[i][0]);
                 newPos.riseY(directions[i][1]);
             }
+        }
+        if(capturePossible){
+            moves.removeIf((move) -> move.captured==null);
         }
         return moves;
     }
