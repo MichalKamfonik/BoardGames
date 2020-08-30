@@ -25,7 +25,7 @@ class DraughtsBoard extends Board {
     private final Map<Position, Figure> figures = new TreeMap<>();
     private final Field[][] fields;
     
-    private JPanel panel; // to be deleted?
+    private final JPanel panel; // to be deleted?
     
     public DraughtsBoard(int maxX, int maxY) {
         this.maxX = maxX;
@@ -39,6 +39,7 @@ class DraughtsBoard extends Board {
         maxX = other.maxX;
         maxY = other.maxY;
         fields = new Field[maxY][maxX];
+        panel = null;
 
         for (int i = 0; i<fields.length; i++){
             for (int j = 0; j < fields[i].length; j++) {

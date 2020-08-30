@@ -1,6 +1,6 @@
 package boardgames;
         
-import javax.swing.JPanel;
+import javax.swing.*;
 
 public abstract class Player {
     protected static final int PANEL_W = 140; // to be moved outside?
@@ -13,5 +13,22 @@ public abstract class Player {
     abstract JPanel getJPanel(); // to be moved outside?
     abstract String getName();
     abstract Move getMove(Board chosenBoard);
+
+    protected void initPlayerPanel(JLabel playerLabel, JComponent playerComponent) {
+        GroupLayout layout = new GroupLayout(this.userPanel);
+        this.userPanel.setLayout(layout);
+
+        layout.setAutoCreateContainerGaps(true);
+        layout.setAutoCreateGaps(true);
+
+        layout.setHorizontalGroup(layout.createParallelGroup()
+                .addComponent(playerLabel, Player.PANEL_W, Player.PANEL_W, Player.PANEL_W)
+                .addComponent(playerComponent, Player.PANEL_W, Player.PANEL_W, Player.PANEL_W)
+        );
+        layout.setVerticalGroup(layout.createSequentialGroup()
+                .addComponent(playerLabel, 20, 20, 20)
+                .addComponent(playerComponent, Player.PANEL_H - 20, Player.PANEL_H - 20, Player.PANEL_H - 20)
+        );
+    }
 }
 

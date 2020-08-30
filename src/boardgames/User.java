@@ -50,20 +50,7 @@ public class User extends Player {
         JLabel userName = new JLabel(this.userName, JLabel.CENTER);
         JLabel userImage = new JLabel(userIcon, JLabel.CENTER);
 
-        GroupLayout layout = new GroupLayout(this.userPanel);
-        this.userPanel.setLayout(layout);
-
-        layout.setAutoCreateContainerGaps(true);
-        layout.setAutoCreateGaps(true);
-
-        layout.setHorizontalGroup(layout.createParallelGroup()
-                .addComponent(userName, Player.PANEL_W, Player.PANEL_W, Player.PANEL_W)
-                .addComponent(userImage, Player.PANEL_W, Player.PANEL_W, Player.PANEL_W)
-        );
-        layout.setVerticalGroup(layout.createSequentialGroup()
-                .addComponent(userName, 20, 20, 20)
-                .addComponent(userImage, Player.PANEL_H - 20, Player.PANEL_H - 20, Player.PANEL_H - 20)
-        );
+        initPlayerPanel(userName, userImage);
     }
 
     @Override

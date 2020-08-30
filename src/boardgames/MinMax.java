@@ -1,9 +1,13 @@
 package boardgames;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.util.*;
 
 public class MinMax extends Player {
+
+    private int difficulty = 3;
 
     public MinMax(int team) {
         super();
@@ -12,28 +16,26 @@ public class MinMax extends Player {
         this.initPanel();
     }
 
+    private void setDifficulty(int difficulty) {
+        this.difficulty = difficulty;
+    }
+
     private void initPanel() {
         JLabel difficultyLabel = new JLabel("Difficulty", JLabel.CENTER);
-        JSlider difficultySlider = new JSlider(1,5,3);
+        JSlider difficultySlider = new JSlider(1,7,difficulty);
         difficultySlider.setMajorTickSpacing(1);
         difficultySlider.setPaintTicks(true);
         difficultySlider.setPaintLabels(true);
         difficultySlider.setSnapToTicks(true);
 
-        GroupLayout layout = new GroupLayout(this.userPanel);
-        this.userPanel.setLayout(layout);
+        difficultySlider.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                difficulty = ((JSlider) e.getSource()).getValue();
+            }
+        });
 
-        layout.setAutoCreateContainerGaps(true);
-        layout.setAutoCreateGaps(true);
-
-        layout.setHorizontalGroup(layout.createParallelGroup()
-                .addComponent(difficultyLabel, Player.PANEL_W, Player.PANEL_W, Player.PANEL_W)
-                .addComponent(difficultySlider, Player.PANEL_W, Player.PANEL_W, Player.PANEL_W)
-        );
-        layout.setVerticalGroup(layout.createSequentialGroup()
-                .addComponent(difficultyLabel, 20, 20, 20)
-                .addComponent(difficultySlider, 50, 50, 50)
-        );
+        initPlayerPanel(difficultyLabel, difficultySlider);
     }
 
     @Override
@@ -54,12 +56,23 @@ public class MinMax extends Player {
     @Override
     Move getMove(Board chosenBoard) {
         List<Move> moves = getAllMoves(chosenBoard);
+        if(moves.isEmpty()) return null;
+
         TreeMap<Integer,Move> nodes = new TreeMap<>();
+        boolean capturePossible = false;
 
         for (Move move : moves) {
             Board node = chosenBoard.deepClone();
             node.moveFigure(move);
-            nodes.put(miniMax(node,2,team),move);
+            if(move.captured!=null) {
+                capturePossible = true;
+                nodes.put(miniMax(node,difficulty,team,move.captured),move);
+            } else if(!capturePossible){
+                nodes.put(miniMax(node,difficulty-1,-team,null), move);
+            }
+        }
+        if(capturePossible){
+            nodes.values().removeIf((move)->move.captured==null);
         }
         return nodes.lastEntry().getValue();
     }
@@ -73,16 +86,23 @@ public class MinMax extends Player {
         return moves;
     }
 
-    private int miniMax(Board board, int difficulty, int team){
-        List<Board> nodes = possibleMoves(board,team);
-        if(difficulty == 0 || nodes.isEmpty()){
-            return valueOfBoard(board);
+    private int miniMax(Board currentBoard, int difficulty, int team, Figure moved){
+        Map<Move,Board> nodes = possibleMoves(currentBoard,team);
+        if(moved != null){
+            nodes.keySet().removeIf((move1) -> !move1.from.equals(moved.getPos())
+                                               || move1.captured == null);
+            if(nodes.isEmpty()) {
+                return miniMax(currentBoard, difficulty-1,-team,null);
+            }
+        } else if(difficulty == 0 || nodes.isEmpty()) {
+            return valueOfBoard(currentBoard);
         }
+
         int value;
         if(team == this.team) {
             value = Integer.MIN_VALUE;
-            for (Board node : nodes) {
-                int nodeValue = miniMax(node,difficulty-1,-team);
+            for (Map.Entry<Move,Board> node : nodes.entrySet()) {
+                int nodeValue = getNodeValue(difficulty, team, node);
                 if(nodeValue > value) {
                     value = nodeValue;
                 }
@@ -90,8 +110,8 @@ public class MinMax extends Player {
         }
         else{
             value = Integer.MAX_VALUE;
-            for (Board node : nodes) {
-                int nodeValue = miniMax(node,difficulty-1,team);
+            for (Map.Entry<Move,Board> node : nodes.entrySet()) {
+                int nodeValue = getNodeValue(difficulty, team, node);
                 if(nodeValue < value) {
                     value = nodeValue;
                 }
@@ -99,6 +119,19 @@ public class MinMax extends Player {
         }
         return value;
     }
+
+    private int getNodeValue(int difficulty, int team, Map.Entry<Move, Board> node) {
+        Move move = node.getKey();
+        Board board = node.getValue();
+
+        if (move.captured != null) {
+            Figure moved = board.getFigure(move.to);
+            return miniMax(board, difficulty, team, moved);
+        } else {
+            return miniMax(board, difficulty - 1, -team, null);
+        }
+    }
+
 
     private int valueOfBoard(Board board) {
         int sum = 0;
@@ -117,10 +150,10 @@ public class MinMax extends Player {
         return sum;
     }
 
-    private List<Board> possibleMoves(Board board,int team){
-        List<Board> nodes = new LinkedList<>();
+    private Map<Move,Board> possibleMoves(Board board,int team){
+        Map<Move,Board> nodes = new HashMap<>();
         if(board.getFigures(-team).isEmpty()) return nodes;
-        boolean capturePossible = false;    // trzeba sie zastanowic gdzie to przeniesc
+        boolean capturePossible = false;    // I have to move it somewhere outside of the algorithm
 
         for (Figure figure : board.getFigures(team)) {
             for (Move move : figure.getMoves(board)) {
@@ -128,16 +161,16 @@ public class MinMax extends Player {
                     capturePossible = true;
                     Board node = board.deepClone();
                     node.moveFigure(move);
-                    nodes.add(node);
+                    nodes.put(move,node);
                 } else if(!capturePossible) {
                     Board node = board.deepClone();
                     node.moveFigure(move);
-                    nodes.add(node);
+                    nodes.put(move,node);
                 }
             }
         }
         if(capturePossible){
-            nodes.removeIf((node)->node.getFigures(-team).size() == board.getFigures(-team).size());
+            nodes.keySet().removeIf((move) -> move.captured==null);
         }
         return nodes;
     }
