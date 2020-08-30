@@ -64,7 +64,7 @@ public class MinMaxAB extends Player {
             if(move.captured!=null) {
                 capturePossible = true;
                 Figure moved = node.getFigure(move.to);
-                nodes.put(alphaBeta(node,difficulty,Integer.MIN_VALUE,Integer.MAX_VALUE,-team,moved),move);
+                nodes.put(alphaBeta(node,difficulty,Integer.MIN_VALUE,Integer.MAX_VALUE,team,moved),move);
             } else if(!capturePossible){
                 nodes.put(alphaBeta(node,difficulty-1,Integer.MIN_VALUE,Integer.MAX_VALUE,-team,null),move);
             }
