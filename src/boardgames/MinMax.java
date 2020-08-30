@@ -1,11 +1,11 @@
 package boardgames;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.util.*;
 
 public class MinMax extends Player {
+    private static final int MAX_DIFFICULTY = 7;
+    private static final int MIN_DIFFICULTY = 1;
 
     private int difficulty = 3;
 
@@ -16,24 +16,21 @@ public class MinMax extends Player {
         this.initPanel();
     }
 
-    private void setDifficulty(int difficulty) {
-        this.difficulty = difficulty;
+    public void setDifficulty(int difficulty) {
+        if(difficulty<=MAX_DIFFICULTY && difficulty>=MIN_DIFFICULTY) {
+            this.difficulty = difficulty;
+        }
     }
 
     private void initPanel() {
         JLabel difficultyLabel = new JLabel("Difficulty", JLabel.CENTER);
-        JSlider difficultySlider = new JSlider(1,7,difficulty);
+        JSlider difficultySlider = new JSlider(MIN_DIFFICULTY,MAX_DIFFICULTY,difficulty);
         difficultySlider.setMajorTickSpacing(1);
         difficultySlider.setPaintTicks(true);
         difficultySlider.setPaintLabels(true);
         difficultySlider.setSnapToTicks(true);
 
-        difficultySlider.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                difficulty = ((JSlider) e.getSource()).getValue();
-            }
-        });
+        difficultySlider.addChangeListener(e -> difficulty = ((JSlider) e.getSource()).getValue());
 
         initPlayerPanel(difficultyLabel, difficultySlider);
     }
