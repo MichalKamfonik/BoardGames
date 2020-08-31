@@ -12,7 +12,7 @@ public abstract class Player {
 
     abstract JPanel getJPanel(); // to be moved outside?
     abstract String getName();
-    abstract Move getMove(Board chosenBoard);
+    abstract Move getMove(Board chosenBoard,Figure moved);
 
     protected void initPlayerPanel(JLabel playerLabel, JComponent playerComponent) {
         GroupLayout layout = new GroupLayout(this.userPanel);

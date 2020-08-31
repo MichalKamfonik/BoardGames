@@ -15,6 +15,7 @@ public abstract class Board {
     abstract public boolean hasPos(Position pos);
     abstract public List<Figure> getFigures(int team);
     abstract public Board deepClone();
+    abstract public List<Move> getAllMoves(int team);
 }
 
 class DraughtsBoard extends Board {
@@ -118,11 +119,12 @@ class DraughtsBoard extends Board {
         Figure moved = figures.remove(move.from);
         
         figures.put(move.to, moved); // Map moved-figure correctly
-        figures.get(move.to).moveTo(move.to); // Update position in moved-figure
+        moved.moveTo(move.to); // Update position in moved-figure
         if(panel!= null) {
             panel.repaint();    // to be deleted
         }
-        return captureFigure(move.captured);
+        captureFigure(move.captured);
+        return moved;
     }
 
     private Figure captureFigure(Figure captured) {
@@ -141,8 +143,9 @@ class DraughtsBoard extends Board {
         List<Figure> figures = new LinkedList<>();
 
         this.figures.forEach((position, figure) -> {
-            if(figure.getTeam() == team)
+            if(figure.getTeam() == team) {
                 figures.add(figure);
+            }
         });
 
         return figures;
@@ -150,6 +153,30 @@ class DraughtsBoard extends Board {
 
     public Board deepClone() {
         return new DraughtsBoard(this);
+    }
+
+    @Override
+    public List<Move> getAllMoves(int team) {
+        List<Move> moves = new LinkedList<>();
+        boolean capturePossible = false;
+
+        this.figures.forEach((position, figure) -> {
+            if(figure.getTeam() == team) {
+                moves.addAll(figure.getMoves(this));
+            }
+        });
+
+        for (Move move : moves) {
+            if(move.captured != null){
+                capturePossible = true;
+                break;
+            }
+        }
+        if(capturePossible) {
+            moves.removeIf((move)->move.captured==null);
+        }
+
+        return moves;
     }
 
     private class BoardPanel extends JPanel { // to be removed?

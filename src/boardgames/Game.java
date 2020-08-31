@@ -1,10 +1,12 @@
 package boardgames;
 
 import javax.swing.JOptionPane;
+import java.util.List;
 
 public abstract class Game implements Runnable {
     protected Player[] players;
     protected Board board;
+    abstract public Figure round(Player player,Board currentBoard,Move move);
 }
 
 class Draughts extends Game {
@@ -22,46 +24,67 @@ class Draughts extends Game {
         
         while(true) {
             int team = round%players.length;
+            Player player = players[team];
             round ++;
-            Move move = players[team].getMove(this.board);
+
+            Move move = player.getMove(board,null);
 
             if(move == null) {
-                JOptionPane.showMessageDialog(null,"The winner is: " + players[round%players.length].getName());
+                JOptionPane.showMessageDialog(null, player.getName()+" lose!");
                 break;
             }
-            while(capturePossible(players[team].team) && move.captured==null) {
+            while(capturePossible(board,player.team) && move.captured==null) {
                 JOptionPane.showMessageDialog(null,"Capture is obligatory");
-                move = players[team].getMove(this.board);
+                move = player.getMove(board,null);
             }
-            board.moveFigure(move);
-            Figure moved = board.getFigure(move.to);
 
-            if(move.captured!=null) {
-                KingsNoCapture[team]=0;
-                continueCapture(moved,team);
-            } else if(board.getFigure(move.to) instanceof DraughtsKing) {
-                KingsNoCapture[team]++;
-                if(tooManyKingsMove()) break;
-            } else {
+            Figure moved = round(player,board,move);
+
+            if(move.captured!=null || moved instanceof DraughtsMan) {
                 KingsNoCapture[team] = 0;
+            } else {
+                KingsNoCapture[team]++;
+            }
+            if(tooManyKingsMove()) {
+                break;
             }
 
-            if(checkPromote(moved)) {
-                promoteMan(moved);
-            }
         }
         System.exit(0);
     }
 
-    private void promoteMan(Figure moved){
-        moved=new DraughtsKing(moved.getPos(), moved.getTeam());
-        board.putFigure(moved);
-        board.moveFigure(new Move(moved.getPos(),moved.getPos(),null));
+    public Figure round(Player player,Board currentBoard,Move move){
+        Figure moved = currentBoard.moveFigure(move);
+
+        if(move.captured!=null) {
+            continueCapture(player,currentBoard,moved);
+        }
+        if(checkPromote(currentBoard,moved)) {
+            moved = promoteMan(currentBoard,moved);
+        }
+        return moved;
     }
 
-    private boolean checkPromote(Figure moved) {
+    private void continueCapture(Player player,Board currentBoard,Figure moved){
+        while(capturePossible(currentBoard,moved)) {
+            Move move = player.getMove(currentBoard,moved);
+            if(move.from.equals(moved.getPos()) && move.captured != null)
+                currentBoard.moveFigure(move);
+            else
+                JOptionPane.showMessageDialog(null,"Capture is obligatory");
+        }
+    }
+
+    private Figure promoteMan(Board currentBoard, Figure moved){
+        moved=new DraughtsKing(moved.getPos(), moved.getTeam());
+        currentBoard.putFigure(moved);
+        currentBoard.moveFigure(new Move(moved.getPos(),moved.getPos(),null));
+        return moved;
+    }
+
+    private boolean checkPromote(Board currentBoard,Figure moved) {
         return moved instanceof DraughtsMan
-                && ((moved.getTeam() == 1 && moved.getPos().y == board.getMaxY())
+                && ((moved.getTeam() == 1 && moved.getPos().y == currentBoard.getMaxY())
                 || (moved.getTeam() == -1 && moved.getPos().y == 1));
     }
 
@@ -72,30 +95,20 @@ class Draughts extends Game {
         JOptionPane.showMessageDialog(null,"Draw");
         return true;
     }
-
-    private void continueCapture(Figure moved, int team){
-        while(capturePossible(moved)) {
-            Move move = players[team].getMove(this.board);
-            if(move.from.equals(moved.getPos()) && move.captured != null)
-                board.moveFigure(move);
-            else
-                JOptionPane.showMessageDialog(null,"Capture is obligatory");
-        }
-    }
     
-    private boolean capturePossible(Figure figure) {
-        var moves = figure.getMoves(board);
+    private boolean capturePossible(Board currentBoard,Figure figure) {
+        List<Move> moves = figure.getMoves(currentBoard);
         return moves.stream().anyMatch((m) -> (m.captured != null));
     }
     
-    private boolean capturePossible(int team) {
+    private boolean capturePossible(Board currentBoard,int team) {
         Position pos = new Position(1,1);
         
-        for(int y=1; y<=board.getMaxY(); y++) {
-            for(int x=1; x<=board.getMaxX(); x++) {
-                if(board.getFigure(pos)!= null
-                        && board.getFigure(pos).getTeam()== team
-                        && capturePossible(board.getFigure(pos))) {
+        for(int y=1; y<=currentBoard.getMaxY(); y++) {
+            for(int x=1; x<=currentBoard.getMaxX(); x++) {
+                if(currentBoard.getFigure(pos)!= null
+                        && currentBoard.getFigure(pos).getTeam()== team
+                        && capturePossible(currentBoard,currentBoard.getFigure(pos))) {
                     return true;
                 }
                 pos.riseX(1);

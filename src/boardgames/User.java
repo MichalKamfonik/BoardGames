@@ -54,7 +54,7 @@ public class User extends Player {
     }
 
     @Override
-    Move getMove(Board chosenBoard) {
+    Move getMove(Board chosenBoard,Figure moved) {
         this.myTurn = true;
         this.currentBoard = chosenBoard;
         nextMove = null;

@@ -8,12 +8,22 @@ public class MinMaxAB extends Player {
     private static final int MIN_DIFFICULTY = 1;
 
     private int difficulty = 5;
+    private final Game game;
 
-    public MinMaxAB(int team) {
+    public MinMaxAB(Game game,int team) {
         super();
+        this.game = game;
         playerName = "MinMax Alpha-Beta";
         this.team = team;
         this.initPanel();
+    }
+
+    private MinMaxAB(Game game,int team,int difficulty){
+        super();
+        this.game = game;
+        playerName = "MinMax Alpha-Beta";
+        this.team = team;
+        this.difficulty = difficulty;
     }
 
     public void setDifficulty(int difficulty) {
@@ -51,40 +61,72 @@ public class MinMaxAB extends Player {
     }
 
     @Override
-    Move getMove(Board chosenBoard) {
-        List<Move> moves = getAllMoves(chosenBoard);
+    Move getMove(Board chosenBoard,Figure moved) {
+        List<Move> moves = getAllMoves(team,chosenBoard,moved);
         if(moves.isEmpty()) return null;
 
         TreeMap<Integer,Move> nodes = new TreeMap<>();
-        boolean capturePossible = false;
 
         for (Move move : moves) {
             Board node = chosenBoard.deepClone();
-            node.moveFigure(move);
-            if(move.captured!=null) {
-                capturePossible = true;
-                Figure moved = node.getFigure(move.to);
-                nodes.put(alphaBeta(node,difficulty,Integer.MIN_VALUE,Integer.MAX_VALUE,team,moved),move);
-            } else if(!capturePossible){
-                nodes.put(alphaBeta(node,difficulty-1,Integer.MIN_VALUE,Integer.MAX_VALUE,-team,null),move);
-            }
+            game.round(this,node,move);
+
+            nodes.put(alphaBeta(node,difficulty-1,Integer.MIN_VALUE,Integer.MAX_VALUE,-team),move);
         }
-        if(capturePossible){
-            nodes.values().removeIf((move)->move.captured==null);
-        }
+
         return nodes.lastEntry().getValue();
     }
 
-    private List<Move> getAllMoves(Board chosenBoard) {
-        List<Move> moves = new LinkedList<>();
-
-        for (Figure figure : chosenBoard.getFigures(team)) {
-            moves.addAll(figure.getMoves(chosenBoard));
+    private int alphaBeta(Board currentBoard, int difficulty, int alpha, int beta, int team){
+        List<Move> moves = getAllMoves(team,currentBoard,null);
+        if(difficulty == 0 || moves.isEmpty()) {
+            return valueOfBoard(currentBoard);
         }
-        return moves;
+        int value;
+        if(team == this.team) {
+            value = Integer.MIN_VALUE;
+            for (Move move : moves) {
+                Board node = currentBoard.deepClone();
+                game.round(new MinMaxAB(game,team,difficulty),node,move);
+
+                value = max(value,alphaBeta(node,difficulty-1,alpha,beta,-team));
+                alpha = max(alpha,value);
+                if(alpha >= beta) {
+                    break;
+                }
+            }
+        }
+        else{
+            value = Integer.MAX_VALUE;
+            for (Move move : moves) {
+                Board node = currentBoard.deepClone();
+                game.round(new MinMaxAB(game,team,difficulty),node,move);
+
+                value = min(value,alphaBeta(node,difficulty-1,alpha,beta,-team));
+                beta = min(beta,value);
+                if(beta <= alpha){
+                    break;
+                }
+            }
+        }
+        return value;
+    }
+    int max(int a, int b){
+        return a>b ? a : b;
+    }
+    int min(int a, int b){
+        return a<b ? a : b;
     }
 
-    private int valueOfBoard(Board board) {
+    private List<Move> getAllMoves(int team,Board chosenBoard,Figure moved) {
+        if(moved != null){
+            return moved.getMoves(chosenBoard);
+        } else {
+            return chosenBoard.getAllMoves(team);
+        }
+    }
+
+    private int valueOfBoard(Board board) { // zmienic zeby to Board podawal swoja wartosc
         int sum = 0;
         List<Figure> myTeam = board.getFigures(team);
         List<Figure> otherTeam = board.getFigures(-team);
@@ -99,94 +141,5 @@ public class MinMaxAB extends Player {
             sum-=figure.getValue();
         }
         return sum;
-    }
-
-    private Map<Move,Board> possibleMoves(Board board,int team,Figure moved){
-        Map<Move,Board> nodes = new HashMap<>();
-
-        if(board.getFigures(-team).isEmpty()) return nodes; // If I won I do not have more moves
-        boolean capturePossible = false;    // I have to move it somewhere outside of the algorithm
-
-        List<Figure> figures;
-
-        if(moved != null){
-            figures = new LinkedList<>();
-            figures.add(moved);
-        } else {
-            figures = board.getFigures(team);
-        }
-
-        for (Figure figure : figures) {
-            for (Move move : figure.getMoves(board)) {
-                if(move.captured != null) {
-                    capturePossible = true;
-                    Board node = board.deepClone();
-                    node.moveFigure(move);
-                    nodes.put(move,node);
-                } else if(!capturePossible) {
-                    Board node = board.deepClone();
-                    node.moveFigure(move);
-                    nodes.put(move,node);
-                }
-            }
-        }
-        if(capturePossible){
-            nodes.keySet().removeIf((move) -> move.captured==null);
-        }
-        return nodes;
-    }
-    private int alphaBeta(Board currentBoard, int difficulty, int alpha, int beta, int team, Figure moved){
-        Map<Move,Board> nodes = possibleMoves(currentBoard,team,moved);
-        if(moved != null) {
-            if(nodes.isEmpty()) {
-                return alphaBeta(currentBoard,difficulty-1,alpha,beta,-team,null);
-            }
-        } else if(difficulty == 0 || nodes.isEmpty()) {
-            return valueOfBoard(currentBoard);
-        }
-
-        int value;
-        if(team == this.team) {
-            value = Integer.MIN_VALUE;
-            for (Map.Entry<Move,Board> node : nodes.entrySet()) {
-                int nodeValue = getNodeValueAB(node,difficulty,alpha,beta,team);
-                if(nodeValue > value) {
-                    value = nodeValue;
-                }
-                if(value > alpha){
-                    alpha = value;
-                }
-                if(alpha >= beta) {
-                    break;
-                }
-            }
-        }
-        else{
-            value = Integer.MAX_VALUE;
-            for (Map.Entry<Move,Board> node : nodes.entrySet()) {
-                int nodeValue = getNodeValueAB(node,difficulty,alpha,beta,team);
-                if(nodeValue < value) {
-                    value = nodeValue;
-                }
-                if(value < beta){
-                    beta = value;
-                }
-                if(beta <= alpha){
-                    break;
-                }
-            }
-        }
-        return value;
-    }
-    private int getNodeValueAB(Map.Entry<Move, Board> node,int difficulty,int alpha, int beta, int team) {
-        Move move = node.getKey();
-        Board board = node.getValue();
-
-        if (move.captured != null) {
-            Figure moved = board.getFigure(move.to);
-            return alphaBeta(board,difficulty,alpha,beta,team,moved);
-        } else {
-            return alphaBeta(board,difficulty-1,alpha,beta,-team,null);
-        }
     }
 }

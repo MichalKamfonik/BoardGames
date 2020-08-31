@@ -51,6 +51,7 @@ public class BoardGames extends JFrame {
     /**
      * Method initializing all the panels int the window
      */
+
     private void InitComponents(){
         pBoard.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
         pPlayer1.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
@@ -113,8 +114,9 @@ public class BoardGames extends JFrame {
             int direction = 3-2*number;
 
 //            players[number-1] = new User(pBoard,direction);
+            Game game = new Draughts(players,chosenBoard);
             if(number == 1) players[number-1] = new User(pBoard,direction); // to be deleted
-            if(number == 2) players[number-1] = new MinMaxAB(direction); // to be deleted
+            if(number == 2) players[number-1] = new MinMaxAB(game,direction); // to be deleted
             
             infoPanel = players[number-1].getJPanel();                          // to be changed
             removedPanel.add(new JLabel("",JLabel.CENTER));                     // to be changed
