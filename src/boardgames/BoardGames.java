@@ -6,8 +6,6 @@
 package boardgames;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 
@@ -46,11 +44,11 @@ public class BoardGames extends JFrame {
     /**
      * Panel for showing Player One
      */
-    private PlayerPanel pPlayer1 = new PlayerPanel(1);
+    private final PlayerPanel pPlayer1 = new PlayerPanel(1);
     /**
      * Panel for showing Player Two
      */
-    private PlayerPanel pPlayer2 = new PlayerPanel(2);
+    private final PlayerPanel pPlayer2 = new PlayerPanel(2);
     /**
      * Method initializing all the panels int the window
      */
@@ -79,16 +77,16 @@ public class BoardGames extends JFrame {
      */
     private class PlayerPanel extends JPanel {
         
-        private String name;
-        private int number;
-        private JPanel selectionPanel = new JPanel();
+        private final String name;
+        private final int number;
+        private final JPanel selectionPanel = new JPanel();
         private JPanel infoPanel;
-        private JPanel removedPanel = new JPanel();
-        private JLabel nameLabel = new JLabel();
+        private final JPanel removedPanel = new JPanel();
+        private final JLabel nameLabel = new JLabel();
 
-        private Player[] availablePlayers;
+        private final Player[] availablePlayers;
         
-        private JComboBox<Player> playerComboBox;
+        private final JComboBox<Player> playerComboBox;
         
         private void initSelectionPanel() {
             GroupLayout layout = new GroupLayout(selectionPanel);
@@ -98,13 +96,10 @@ public class BoardGames extends JFrame {
             layout.setAutoCreateContainerGaps(true);
             layout.setAutoCreateGaps(true);
 
-            playerComboBox.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    JComboBox<Player> comboBox = (JComboBox<Player>) e.getSource();
-                    players[number-1] = (Player) comboBox.getSelectedItem();
-                    infoPanel = players[number-1].getJPanel();
-                }
+            playerComboBox.addActionListener(e -> {
+                JComboBox<Player> comboBox = (JComboBox<Player>) e.getSource();
+                players[number-1] = (Player) comboBox.getSelectedItem();
+                infoPanel = players[number-1].getJPanel();
             });
             
             layout.setHorizontalGroup(layout.createSequentialGroup()
