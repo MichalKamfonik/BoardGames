@@ -6,14 +6,19 @@ import java.util.List;
 public abstract class Game implements Runnable {
     protected Player[] players;
     protected Board board;
-    abstract public Figure round(Player player,Board currentBoard,Move move);
+
+    public Board getBoard() {
+        return board;
+    }
+
+    abstract public Figure round(Player player, Board currentBoard, Move move);
 }
 
 class Draughts extends Game {
     int[] KingsNoCapture;
 
-    public Draughts(Player[] players, Board board) {
-        this.board = board;
+    public Draughts(Player[] players) {
+        this.board = new DraughtsBoard(8,8);
         this.players = players;
         KingsNoCapture = new int[players.length];
     }

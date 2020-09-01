@@ -6,6 +6,8 @@
 package boardgames;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 
@@ -27,19 +29,20 @@ public class BoardGames extends JFrame {
     /**
      * Content Pane reference
      */
-    private Container contentPane = this.getContentPane();
-    /**
-     * Chosen Board game
-     */
-    private Board chosenBoard = new DraughtsBoard(8,8);
-    /**
-     * Panel for showing The Board
-     */
-    private JPanel pBoard = chosenBoard.getJPanel();
+    private final Container contentPane = this.getContentPane();
     /**
      * Array of players in the game
      */
-    private Player[] players = new Player[2];
+    private final Player[] players = new Player[2];
+    /**
+     * Chosen Board game
+     */
+    private final Game chosenGame = new Draughts(players);
+    private final Board chosenBoard = chosenGame.getBoard();
+    /**
+     * Panel for showing The Board
+     */
+    private final JPanel pBoard = chosenBoard.getJPanel();
     /**
      * Panel for showing Player One
      */
@@ -77,14 +80,15 @@ public class BoardGames extends JFrame {
     private class PlayerPanel extends JPanel {
         
         private String name;
+        private int number;
         private JPanel selectionPanel = new JPanel();
         private JPanel infoPanel;
         private JPanel removedPanel = new JPanel();
         private JLabel nameLabel = new JLabel();
+
+        private Player[] availablePlayers;
         
-        private Player[] availablePlayers = new Player[2];                      // tutaj dodawaj możliwych graczy(algorytmy/userow...)
-        
-        private JComboBox<Player> playerCombBox = new JComboBox<>(availablePlayers);
+        private JComboBox<Player> playerComboBox;
         
         private void initSelectionPanel() {
             GroupLayout layout = new GroupLayout(selectionPanel);
@@ -93,30 +97,39 @@ public class BoardGames extends JFrame {
             
             layout.setAutoCreateContainerGaps(true);
             layout.setAutoCreateGaps(true);
+
+            playerComboBox.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    JComboBox<Player> comboBox = (JComboBox<Player>) e.getSource();
+                    players[number-1] = (Player) comboBox.getSelectedItem();
+                    infoPanel = players[number-1].getJPanel();
+                }
+            });
             
             layout.setHorizontalGroup(layout.createSequentialGroup()
                     .addComponent(nameLabel,50,50,50)
-                    .addComponent(playerCombBox,80,80,80)
+                    .addComponent(playerComboBox,80,80,80)
             );
             layout.setVerticalGroup(layout.createParallelGroup()
                     .addComponent(nameLabel,20,20,20)
-                    .addComponent(playerCombBox,20,20,20)
+                    .addComponent(playerComboBox,20,20,20)
             );
         }
         
         public PlayerPanel(int number) {
             super();
-            this.name = "Player" + number;
+            this.number = number;
+            this.name = "Player" + this.number;
             nameLabel.setText(this.name);
-            
-            initSelectionPanel();
-            
-            int direction = 3-2*number;
 
-//            players[number-1] = new User(pBoard,direction);
-            Game game = new Draughts(players,chosenBoard);
-            if(number == 1) players[number-1] = new User(pBoard,direction); // to be deleted
-            if(number == 2) players[number-1] = new MinMaxAB(game,direction); // to be deleted
+            int direction = 3-2*number;
+            availablePlayers = new Player[]{new User(pBoard,direction), new MinMaxAB(chosenGame,direction)};
+            playerComboBox = new JComboBox<>(availablePlayers);
+
+            initSelectionPanel();
+
+            players[number-1] = availablePlayers[0]; // default player
             
             infoPanel = players[number-1].getJPanel();                          // to be changed
             removedPanel.add(new JLabel("",JLabel.CENTER));                     // to be changed
@@ -165,7 +178,7 @@ public class BoardGames extends JFrame {
             BoardGames bG = new BoardGames();
             bG.setVisible(true);
 
-            Thread game = new Thread(new Draughts(bG.players, bG.chosenBoard));
+            Thread game = new Thread(bG.chosenGame);
             game.start();
         });
     }
