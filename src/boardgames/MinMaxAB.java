@@ -135,6 +135,8 @@ public class MinMaxAB extends Player {
 
         if(myTeam.isEmpty()) return -100;
         if(otherTeam.isEmpty()) return 100;
+        if(board.getAllMoves(team).isEmpty()) return -100;
+        if(board.getAllMoves(-team).isEmpty()) return 100;
 
         for (Figure figure : myTeam) {
             sum+=figure.getValue();
