@@ -91,8 +91,8 @@ public class MinMaxAB extends Player {
                 Board node = currentBoard.deepClone();
                 game.round(new MinMaxAB(game,team,difficulty),node,move);
 
-                value = max(value,alphaBeta(node,difficulty-1,alpha,beta,-team));
-                alpha = max(alpha,value);
+                value = Math.max(value,alphaBeta(node,difficulty-1,alpha,beta,-team));
+                alpha = Math.max(alpha,value);
                 if(alpha >= beta) {
                     break;
                 }
@@ -104,20 +104,14 @@ public class MinMaxAB extends Player {
                 Board node = currentBoard.deepClone();
                 game.round(new MinMaxAB(game,team,difficulty),node,move);
 
-                value = min(value,alphaBeta(node,difficulty-1,alpha,beta,-team));
-                beta = min(beta,value);
+                value = Math.min(value,alphaBeta(node,difficulty-1,alpha,beta,-team));
+                beta = Math.min(beta,value);
                 if(beta <= alpha){
                     break;
                 }
             }
         }
         return value;
-    }
-    int max(int a, int b){
-        return a>b ? a : b;
-    }
-    int min(int a, int b){
-        return a<b ? a : b;
     }
 
     private List<Move> getAllMoves(int team,Board chosenBoard,Figure moved) {
