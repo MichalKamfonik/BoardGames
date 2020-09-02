@@ -80,7 +80,7 @@ public class BoardGames extends JFrame {
         private final String name;
         private final int number;
         private final JPanel selectionPanel = new JPanel();
-        private JPanel infoPanel;
+        private final JPanel infoPanel = new JPanel();
         private final JPanel removedPanel = new JPanel();
         private final JLabel nameLabel = new JLabel();
 
@@ -98,8 +98,9 @@ public class BoardGames extends JFrame {
 
             playerComboBox.addActionListener(e -> {
                 JComboBox<Player> comboBox = (JComboBox<Player>) e.getSource();
+                players[number-1].playerChanged();
                 players[number-1] = (Player) comboBox.getSelectedItem();
-                infoPanel = players[number-1].getJPanel();
+                players[number-1].initInfoPanel();
             });
             
             layout.setHorizontalGroup(layout.createSequentialGroup()
@@ -113,20 +114,19 @@ public class BoardGames extends JFrame {
         }
         
         public PlayerPanel(int number) {
-            super();
             this.number = number;
-            this.name = "Player" + this.number;
+            this.name = "Player " + this.number;
             nameLabel.setText(this.name);
 
             int direction = 3-2*number;
-            availablePlayers = new Player[]{new User(pBoard,direction), new MinMaxAB(chosenGame,direction)};
+            availablePlayers = new Player[]{new User(infoPanel,pBoard,direction), new MinMaxAB(infoPanel,chosenGame,direction)};
             playerComboBox = new JComboBox<>(availablePlayers);
 
             initSelectionPanel();
 
-            players[number-1] = availablePlayers[0]; // default player
-            
-            infoPanel = players[number-1].getJPanel();                          // to be changed
+            players[number-1] = availablePlayers[0];
+            players[number-1].initInfoPanel();
+
             removedPanel.add(new JLabel("",JLabel.CENTER));                     // to be changed
             
             infoPanel.setBorder(BorderFactory.createEtchedBorder());

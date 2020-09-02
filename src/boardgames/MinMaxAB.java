@@ -10,12 +10,12 @@ public class MinMaxAB extends Player {
     private int difficulty = 5;
     private final Game game;
 
-    public MinMaxAB(Game game,int team) {
+    public MinMaxAB(JPanel infoPanel,Game game,int team) {
         super();
+        this.infoPanel = infoPanel;
         this.game = game;
         playerName = "MinMax Alpha-Beta";
         this.team = team;
-        this.initPanel();
     }
 
     private MinMaxAB(Game game,int team,int difficulty){
@@ -26,13 +26,8 @@ public class MinMaxAB extends Player {
         this.difficulty = difficulty;
     }
 
-    public void setDifficulty(int difficulty) {
-        if(difficulty<=MAX_DIFFICULTY && difficulty>=MIN_DIFFICULTY) {
-            this.difficulty = difficulty;
-        }
-    }
-
-    private void initPanel() {
+    public void initInfoPanel() {
+        infoPanel.removeAll();
         JLabel difficultyLabel = new JLabel("Difficulty", JLabel.CENTER);
         JSlider difficultySlider = new JSlider(MIN_DIFFICULTY,MAX_DIFFICULTY,difficulty);
         difficultySlider.setMajorTickSpacing(1);
@@ -46,8 +41,8 @@ public class MinMaxAB extends Player {
     }
 
     @Override
-    public JPanel getJPanel() {
-        return this.userPanel;
+    void playerChanged() {
+        playerChanged = true;
     }
 
     @Override
@@ -62,6 +57,7 @@ public class MinMaxAB extends Player {
 
     @Override
     Move getMove(Board chosenBoard,Figure moved) {
+        playerChanged = false;
         List<Move> moves = getAllMoves(team,chosenBoard,moved);
         if(moves.isEmpty()) return null;
 
@@ -72,6 +68,12 @@ public class MinMaxAB extends Player {
             game.round(this,node,move);
 
             nodes.put(alphaBeta(node,difficulty-1,Integer.MIN_VALUE,Integer.MAX_VALUE,-team),move);
+            if(playerChanged) {
+                if(moved == null) {
+                    playerChanged = false;
+                }
+                return null;
+            }
         }
 
         return nodes.lastEntry().getValue();
@@ -79,7 +81,7 @@ public class MinMaxAB extends Player {
 
     private int alphaBeta(Board currentBoard, int difficulty, int alpha, int beta, int team){
         List<Move> moves = getAllMoves(team,currentBoard,null);
-        if(difficulty == 0 || moves.isEmpty()) {
+        if(difficulty == 0 || moves.isEmpty() || playerChanged) {
             return valueOfBoard(currentBoard);
         }
         int value;

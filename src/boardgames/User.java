@@ -20,20 +20,15 @@ public class User extends Player {
     private Move nextMove;
     private Board currentBoard;
 
-    public User(JPanel boardPanel, int team) {
+    public User(JPanel infoPanel,JPanel boardPanel, int team) {
         super();
         playerName = "User";
         userIcon = new ImageIcon(new ImageIcon("borysek.jpg").getImage().getScaledInstance(100, -1, Image.SCALE_DEFAULT));
         this.team = team;
-        this.initPanel();
+        this.infoPanel = infoPanel;
         this.boardPanel = boardPanel;
         this.boardPanel.addMouseListener(new MouseFigurePicker());
         this.boardPanel.addMouseMotionListener(new MouseFigureDragger());
-    }
-
-    @Override
-    public JPanel getJPanel() {
-        return this.userPanel;
     }
 
     @Override
@@ -46,7 +41,8 @@ public class User extends Player {
         return this.userName;
     }
 
-    private void initPanel() {
+    public void initInfoPanel() {
+        infoPanel.removeAll();
         JLabel userName = new JLabel(this.userName, JLabel.CENTER);
         JLabel userImage = new JLabel(userIcon, JLabel.CENTER);
 
@@ -54,19 +50,30 @@ public class User extends Player {
     }
 
     @Override
+    void playerChanged() {
+        playerChanged = true;
+    }
+
+    @Override
     Move getMove(Board chosenBoard,Figure moved) {
+        playerChanged = false;
         this.myTurn = true;
         this.currentBoard = chosenBoard;
         nextMove = null;
 
         if (!movePossible()) return null;
 
-        while (nextMove == null) {
+        while (nextMove == null && !playerChanged) {
             try {
                 Thread.sleep(10); // waiting for player to click;
             } catch (InterruptedException ex) {
                 ex.printStackTrace();
             }
+        }
+        if (playerChanged){
+            clearMove();
+            nextMove = null;
+            playerChanged = false;
         }
 
         return nextMove;
@@ -154,15 +161,21 @@ public class User extends Player {
         private void finishMove(Position pos) {
             for (Move m : moves) {
                 if (m.from.equals(picked.getPos()) && m.to.equals(pos)) {
-                    picked.unpick();
-                    picked = null;
+                    clearMove();
                     nextMove = m;
-                    myTurn = false;
-                    oldPos = null;
                     break;
                 }
             }
         }
+    }
+
+    private void clearMove(){
+        if(picked != null) {
+            picked.unpick();
+        }
+        picked = null;
+        myTurn = false;
+        oldPos = null;
     }
 
     private class MouseFigureDragger extends MouseMotionAdapter {

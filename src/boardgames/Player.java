@@ -6,17 +6,19 @@ public abstract class Player {
     protected static final int PANEL_W = 140; // to be moved outside?
     protected static final int PANEL_H = 170; // to be moved outside?
 
-    protected JPanel userPanel = new JPanel(); // to be moved outside?
+    protected JPanel infoPanel; // to be moved outside?
     protected String playerName = "";
     protected int team;
+    protected boolean playerChanged = false;
 
-    abstract JPanel getJPanel(); // to be moved outside?
     abstract String getName();
     abstract Move getMove(Board chosenBoard,Figure moved);
+    abstract void initInfoPanel();
+    abstract void playerChanged();
 
-    protected void initPlayerPanel(JLabel playerLabel, JComponent playerComponent) {
-        GroupLayout layout = new GroupLayout(this.userPanel);
-        this.userPanel.setLayout(layout);
+    protected final void initPlayerPanel(JLabel playerLabel, JComponent playerComponent) {
+        GroupLayout layout = new GroupLayout(this.infoPanel);
+        this.infoPanel.setLayout(layout);
 
         layout.setAutoCreateContainerGaps(true);
         layout.setAutoCreateGaps(true);

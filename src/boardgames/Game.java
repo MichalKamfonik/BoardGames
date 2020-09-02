@@ -28,14 +28,20 @@ class Draughts extends Game {
         int round = 0;
         
         while(true) {
-            int team = round%players.length;
-            Player player = players[team];
+            int myTeam = round%players.length;
+            int otherTeam = (round+1)%players.length;
+            Player player = players[myTeam];
+            Player oponent = players[otherTeam];
             round ++;
 
             Move move = player.getMove(board,null);
+            while(player != players[myTeam]){
+                player = players[myTeam];
+                move = player.getMove(board,null);
+            }
 
             if(move == null) {
-                JOptionPane.showMessageDialog(null, player.getName()+" lose!");
+                JOptionPane.showMessageDialog(null,"Player "+(otherTeam+1)+": "+oponent.getName()+" wins!");
                 break;
             }
             while(capturePossible(board,player.team) && move.captured==null) {
@@ -46,9 +52,9 @@ class Draughts extends Game {
             Figure moved = round(player,board,move);
 
             if(move.captured!=null || moved instanceof DraughtsMan) {
-                KingsNoCapture[team] = 0;
+                KingsNoCapture[myTeam] = 0;
             } else {
-                KingsNoCapture[team]++;
+                KingsNoCapture[myTeam]++;
             }
             if(tooManyKingsMove()) {
                 break;
