@@ -1,11 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package boardgames;
 
 import java.awt.*;
+import java.util.ConcurrentModificationException;
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 
@@ -13,7 +9,7 @@ import javax.swing.border.EtchedBorder;
  * A graphic interface for playing some board games.
  * 
  * @author Michał Kamfonik
- * @version 0.1 29-05-2020
+ * @version 0.1 06-09-2020
  */
 public class BoardGames extends JFrame {
     /**
@@ -25,7 +21,12 @@ public class BoardGames extends JFrame {
      */
     private static final int Frame_W = 800;
     /**
+     * Default Field size
+     */
+    private static final int FIELD_SIZE = 30;
+    /**
      * Content Pane reference
+     *
      */
     private final Container contentPane = this.getContentPane();
     /**
@@ -35,48 +36,43 @@ public class BoardGames extends JFrame {
     /**
      * Chosen Board game
      */
-    private final Game chosenGame = new Draughts(players);
+    private final Game chosenGame = new Draughts(this,players);
     private final Board chosenBoard = chosenGame.getBoard();
     /**
      * Panel for showing The Board
      */
-    private final JPanel pBoard = chosenBoard.getJPanel();
+    private final JPanel pBoard = new BoardPanel();
     /**
      * Panel for showing Player One
      */
-    private final PlayerPanel pPlayer1 = new PlayerPanel(1);
-    /**
-     * Panel for showing Player Two
-     */
-    private final PlayerPanel pPlayer2 = new PlayerPanel(2);
+    private final PlayerPanel[] pPlayer = {new PlayerPanel(1),new PlayerPanel(2)};
     /**
      * Method initializing all the panels int the window
      */
-
     private void InitComponents(){
         pBoard.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-        pPlayer1.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-        pPlayer2.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+        pPlayer[0].setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+        pPlayer[1].setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
         
         GroupLayout layout = new GroupLayout(contentPane);
         contentPane.setLayout(layout);
         
         layout.setHorizontalGroup(layout.createSequentialGroup()
-                .addComponent(pPlayer1,200,200,200)
+                .addComponent(pPlayer[0],200,200,200)
                 .addComponent(pBoard)
-                .addComponent(pPlayer2,200,200,200)
+                .addComponent(pPlayer[1],200,200,200)
         );
         layout.setVerticalGroup(layout.createParallelGroup()
-                .addComponent(pPlayer1)
+                .addComponent(pPlayer[0])
                 .addComponent(pBoard)
-                .addComponent(pPlayer2)
+                .addComponent(pPlayer[1])
         );
     }
     /**
      * Panel for displaying player information
      */
     private class PlayerPanel extends JPanel {
-        
+
         private final String name;
         private final int number;
         private final JPanel selectionPanel = new JPanel();
@@ -97,15 +93,15 @@ public class BoardGames extends JFrame {
             layout.setAutoCreateGaps(true);
 
             playerComboBox.addActionListener(e -> {
-                JComboBox<Player> comboBox = (JComboBox<Player>) e.getSource();
+                JComboBox<Player> comboBox = (JComboBox<Player>)e.getSource();
                 players[number-1].playerChanged();
                 players[number-1] = (Player) comboBox.getSelectedItem();
                 players[number-1].initInfoPanel();
             });
             
             layout.setHorizontalGroup(layout.createSequentialGroup()
-                    .addComponent(nameLabel,50,50,50)
-                    .addComponent(playerComboBox,80,80,80)
+                    .addComponent(nameLabel,60,60,60)
+                    .addComponent(playerComboBox,60,60,60)
             );
             layout.setVerticalGroup(layout.createParallelGroup()
                     .addComponent(nameLabel,20,20,20)
@@ -126,8 +122,6 @@ public class BoardGames extends JFrame {
 
             players[number-1] = availablePlayers[0];
             players[number-1].initInfoPanel();
-
-            removedPanel.add(new JLabel("",JLabel.CENTER));                     // to be changed
             
             infoPanel.setBorder(BorderFactory.createEtchedBorder());
             removedPanel.setBorder(BorderFactory.createEtchedBorder());
@@ -148,8 +142,20 @@ public class BoardGames extends JFrame {
                     .addContainerGap(0,Short.MAX_VALUE)
                     .addComponent(infoPanel,200,200,200)
                     .addContainerGap(0,Short.MAX_VALUE)
-                    .addComponent(removedPanel)
+                    .addComponent(removedPanel,120,120,120)
             );
+        }
+
+        public void captureFigure(Figure captured){
+                removedPanel.add(new JLabel(captured.getImage()),new Object());
+                revalidate();
+                repaint();
+        }
+    }
+
+    public void captureFigure(int number,Figure captured){
+        if(captured != null) {
+            pPlayer[number].captureFigure(captured);
         }
     }
     
@@ -164,6 +170,33 @@ public class BoardGames extends JFrame {
         
         InitComponents();
         //this.pack();
+    }
+    private class BoardPanel extends JPanel {
+        @Override
+        public void paintComponent(Graphics g) {
+
+            int maxX = chosenBoard.getMaxX();
+            int maxY = chosenBoard.getMaxY();
+            int offsetX = (this.getBounds().width - FIELD_SIZE*maxX)/2;
+            int offsetY = (this.getBounds().height - FIELD_SIZE*maxY)/2;
+
+            for(int y=maxY; y>0; y--) {
+                for(int x=1; x<=maxX; x++) {
+                    Position pos = new Position(x,y);
+                    g.drawImage(chosenBoard.getField(pos).getImage(),offsetX+(x-1)*FIELD_SIZE,offsetY+(maxY-y)*FIELD_SIZE,null);
+                }
+            }
+            try{
+                chosenBoard.getFigures().forEach((fig) -> g.drawImage(fig.getImage().getImage(),offsetX+(fig.getPos().x-1)*FIELD_SIZE,offsetY+(maxY-fig.getPos().y)*FIELD_SIZE,null));
+            }
+            catch(ConcurrentModificationException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void showMessage(String s){
+        JOptionPane.showMessageDialog(null,s);
     }
     /**
      * @param args the command line arguments

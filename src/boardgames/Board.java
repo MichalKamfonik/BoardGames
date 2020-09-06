@@ -1,19 +1,17 @@
 package boardgames;
 
-import java.awt.Graphics;
 import java.util.*;
-import javax.swing.JPanel;
 
 public abstract class Board {
     abstract public Figure getFigure(Position pos);
+    abstract public List<Figure> getFigures();
+    abstract public List<Figure> getFigures(int team);
     abstract public Field getField(Position pos);
     abstract public void putFigure(Figure fig);
-    abstract public JPanel getJPanel(); // to be moved outside?
     abstract public int getMaxX();
     abstract public int getMaxY();
     abstract public Figure moveFigure(Move move);
     abstract public boolean hasPos(Position pos);
-    abstract public List<Figure> getFigures(int team);
     abstract public Board deepClone();
     abstract public List<Move> getAllMoves(int team);
 }
@@ -26,12 +24,10 @@ class DraughtsBoard extends Board {
     private final Map<Position, Figure> figures = new TreeMap<>();
     private final Field[][] fields;
     
-    private final JPanel panel; // to be deleted?
-    
     public DraughtsBoard(int maxX, int maxY) {
         this.maxX = maxX;
         this.maxY = maxY;
-        panel = new BoardPanel();
+
         fields = new Field[maxY][maxX];
         initializeBoard();
     }
@@ -40,18 +36,13 @@ class DraughtsBoard extends Board {
         maxX = other.maxX;
         maxY = other.maxY;
         fields = new Field[maxY][maxX];
-        panel = null;
 
         for (int i = 0; i<fields.length; i++){
             for (int j = 0; j < fields[i].length; j++) {
                 fields[i][j] = new Field(other.fields[i][j]);
             }
         }
-
-        for (Figure figure : other.getFigures(1)) {
-            figures.put(new Position(figure.getPos()),figure.deepClone());
-        }
-        for (Figure figure : other.getFigures(-1)) {
+        for (Figure figure : other.getFigures()) {
             figures.put(new Position(figure.getPos()),figure.deepClone());
         }
     }
@@ -100,11 +91,6 @@ class DraughtsBoard extends Board {
     }
 
     @Override
-    public JPanel getJPanel() { // to be deleted
-        return panel;
-    }
-
-    @Override
     public int getMaxX() {
         return maxX;
     }
@@ -119,10 +105,8 @@ class DraughtsBoard extends Board {
         Figure moved = figures.remove(move.from);
         
         figures.put(move.to, moved); // Map moved-figure correctly
-        moved.moveTo(move.to); // Update position in moved-figure
-        if(panel!= null) {
-            panel.repaint();    // to be deleted
-        }
+        moved.moveTo(move.to);       // Update position in moved-figure
+
         captureFigure(move.captured);
         return moved;
     }
@@ -150,6 +134,14 @@ class DraughtsBoard extends Board {
 
         return figures;
     }
+    @Override
+    public List<Figure> getFigures(){
+        List<Figure> figures = new LinkedList<>();
+
+        this.figures.forEach((position, figure) -> figures.add(figure));
+
+        return figures;
+    }
 
     public Board deepClone() {
         return new DraughtsBoard(this);
@@ -165,7 +157,6 @@ class DraughtsBoard extends Board {
                 moves.addAll(figure.getMoves(this));
             }
         });
-
         for (Move move : moves) {
             if(move.captured != null){
                 capturePossible = true;
@@ -175,34 +166,6 @@ class DraughtsBoard extends Board {
         if(capturePossible) {
             moves.removeIf((move)->move.captured==null);
         }
-
         return moves;
-    }
-
-    private class BoardPanel extends JPanel { // to be removed?
-        
-        int offsetX;
-        int offsetY;
-        
-        @Override
-        public void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            
-            offsetX = (this.getBounds().width - 30*maxX)/2;
-            offsetY = (this.getBounds().height - 30*maxY)/2;
-            
-            for(int y=maxY; y>0; y--) {
-                for(int x=1; x<=maxX; x++) {
-                    Position pos = new Position(x,y);
-                    g.drawImage(getField(pos).getImage(),offsetX+(x-1)*30,offsetY+(maxY-y)*30,null);
-                }
-            }
-            try{
-                figures.forEach((pos, fig) -> g.drawImage(fig.getImage(),offsetX+(fig.getPos().x-1)*30,offsetY+(maxY-fig.getPos().y)*30,null));
-            }
-            catch(ConcurrentModificationException e) {
-                e.printStackTrace();
-            }
-        }
     }
 }

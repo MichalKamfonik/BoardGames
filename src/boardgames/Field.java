@@ -25,7 +25,6 @@ public class Field {
         else if(color == BLACK){
             return imageBlack;
         }
-
         return null;
     }
 }

@@ -1,6 +1,5 @@
 package boardgames;
 
-import javax.swing.JOptionPane;
 import java.util.List;
 
 public abstract class Game implements Runnable {
@@ -10,19 +9,19 @@ public abstract class Game implements Runnable {
     public Board getBoard() {
         return board;
     }
-
     abstract public Figure round(Player player, Board currentBoard, Move move);
 }
 
 class Draughts extends Game {
-    int[] KingsNoCapture;
+    private final int[] KingsNoCapture;
+    private final BoardGames bG;
 
-    public Draughts(Player[] players) {
+    public Draughts(BoardGames bG,Player[] players) {
+        this.bG = bG;
         this.board = new DraughtsBoard(8,8);
         this.players = players;
         KingsNoCapture = new int[players.length];
     }
-    
     @Override
     public void run() {
         int round = 0;
@@ -31,25 +30,25 @@ class Draughts extends Game {
             int myTeam = round%players.length;
             int otherTeam = (round+1)%players.length;
             Player player = players[myTeam];
-            Player oponent = players[otherTeam];
+            Player opponent = players[otherTeam];
             round ++;
 
             Move move = player.getMove(board,null);
-            while(player != players[myTeam]){
+            while(player != players[myTeam]){   // in case that player was changed while choosing move
                 player = players[myTeam];
                 move = player.getMove(board,null);
             }
-
             if(move == null) {
-                JOptionPane.showMessageDialog(null,"Player "+(otherTeam+1)+": "+oponent.getName()+" wins!");
+                bG.showMessage("Player "+(otherTeam+1)+": "+opponent.getName()+" wins!");
                 break;
             }
             while(capturePossible(board,player.team) && move.captured==null) {
-                JOptionPane.showMessageDialog(null,"Capture is obligatory");
+                bG.showMessage("Capture is obligatory");
                 move = player.getMove(board,null);
             }
 
             Figure moved = round(player,board,move);
+            bG.repaint();
 
             if(move.captured!=null || moved instanceof DraughtsMan) {
                 KingsNoCapture[myTeam] = 0;
@@ -66,7 +65,13 @@ class Draughts extends Game {
 
     public Figure round(Player player,Board currentBoard,Move move){
         Figure moved = currentBoard.moveFigure(move);
-
+        if(board == currentBoard) {
+            int currentPlayer;
+            if(player.team == 1) currentPlayer = 0;
+            else currentPlayer = 1;
+            bG.captureFigure(currentPlayer,move.captured);
+            bG.repaint();
+        }
         if(move.captured!=null) {
             continueCapture(player,currentBoard,moved);
         }
@@ -79,10 +84,19 @@ class Draughts extends Game {
     private void continueCapture(Player player,Board currentBoard,Figure moved){
         while(capturePossible(currentBoard,moved)) {
             Move move = player.getMove(currentBoard,moved);
-            if(move.from.equals(moved.getPos()) && move.captured != null)
+            if(move.from.equals(moved.getPos()) && move.captured != null) {
                 currentBoard.moveFigure(move);
-            else
-                JOptionPane.showMessageDialog(null,"Capture is obligatory");
+                if(board == currentBoard) {
+                    int currentPlayer;
+                    if(player.team == 1) currentPlayer = 0;
+                    else currentPlayer = 1;
+                    bG.captureFigure(currentPlayer,move.captured);
+                    bG.repaint();
+                }
+            }
+            else {
+                bG.showMessage("Capture is obligatory");
+            }
         }
     }
 
@@ -103,7 +117,7 @@ class Draughts extends Game {
         for(int i: KingsNoCapture) {
             if(i < 15) return false;
         }
-        JOptionPane.showMessageDialog(null,"Draw");
+        bG.showMessage("Draw");
         return true;
     }
     

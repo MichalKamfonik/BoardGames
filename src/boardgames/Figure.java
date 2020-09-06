@@ -1,6 +1,5 @@
 package boardgames;
 
-import java.awt.Image;
 import java.util.LinkedList;
 import java.util.List;
 import javax.swing.ImageIcon;
@@ -8,7 +7,7 @@ import javax.swing.ImageIcon;
 public abstract class Figure {
     abstract public List<Move> getMoves(Board currentBoard);
     abstract public int getTeam();
-    abstract public Image getImage();
+    abstract public ImageIcon getImage();
     abstract public Position getPos();
     abstract public void moveTo(Position newPos);
     abstract public void pick();
@@ -76,16 +75,16 @@ class Move {
 
 class DraughtsMan extends Figure {
     private static final String name = "Man";
-    private static final Image imageBlack=new ImageIcon("black.png").getImage();
-    private static final Image imageWhite=new ImageIcon("white.png").getImage();
-    private static final Image imageBlackPicked=new ImageIcon("blackP.png").getImage();
-    private static final Image imageWhitePicked=new ImageIcon("whiteP.png").getImage();
+    private static final ImageIcon imageBlack=new ImageIcon("black.png");
+    private static final ImageIcon imageWhite=new ImageIcon("white.png");
+    private static final ImageIcon imageBlackPicked=new ImageIcon("blackP.png");
+    private static final ImageIcon imageWhitePicked=new ImageIcon("whiteP.png");
     private static final int VALUE = 1;
 
     private Position currentPos;
     private final int team;
     
-    private Image currentImage;
+    private ImageIcon currentImage;
     
     public DraughtsMan(Position pos,int team) {
         this.currentPos = pos;
@@ -155,7 +154,7 @@ class DraughtsMan extends Figure {
     }
 
     @Override
-    public Image getImage() {
+    public ImageIcon getImage() {
         return this.currentImage;
     }
 
@@ -188,16 +187,16 @@ class DraughtsMan extends Figure {
 
 class DraughtsKing extends Figure{
     private static final String name = "King";
-    private static final Image imageBlack=new ImageIcon("blackKing.png").getImage();
-    private static final Image imageWhite=new ImageIcon("whiteKing.png").getImage();
-    private static final Image imageBlackPicked=new ImageIcon("blackKingP.png").getImage();
-    private static final Image imageWhitePicked=new ImageIcon("whiteKingP.png").getImage();
+    private static final ImageIcon imageBlack=new ImageIcon("blackKing.png");
+    private static final ImageIcon imageWhite=new ImageIcon("whiteKing.png");
+    private static final ImageIcon imageBlackPicked=new ImageIcon("blackKingP.png");
+    private static final ImageIcon imageWhitePicked=new ImageIcon("whiteKingP.png");
     private static final int VALUE = 5;
 
     private Position currentPos;
     private final int team;
     
-    private Image currentImage;
+    private ImageIcon currentImage;
     
     public DraughtsKing(Position pos,int team) {
         this.currentPos = pos;
@@ -263,7 +262,7 @@ class DraughtsKing extends Figure{
     }
 
     @Override
-    public Image getImage() {
+    public ImageIcon getImage() {
         return this.currentImage;
     }
 
