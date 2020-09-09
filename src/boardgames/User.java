@@ -21,9 +21,8 @@ public class User extends Player {
     private Board currentBoard;
 
     public User(JPanel infoPanel,JPanel boardPanel, int team) {
-        super();
         playerName = "User";
-        userIcon = new ImageIcon(new ImageIcon("borysek.jpg").getImage().getScaledInstance(100, -1, Image.SCALE_DEFAULT));
+        userIcon = new ImageIcon(new ImageIcon("images/borysek.jpg").getImage().getScaledInstance(100, -1, Image.SCALE_DEFAULT));
         this.team = team;
         this.infoPanel = infoPanel;
         this.boardPanel = boardPanel;

@@ -6,10 +6,10 @@ import java.awt.*;
 public class Field {
     public static final int WHITE = 0;
     public static final int BLACK = 1;
-    private static final Image imageWhite = new ImageIcon("whiteSpot.png").getImage();
-    private static final Image imageBlack = new ImageIcon("blackSpot.png").getImage();
+    private static final Image imageWhite = new ImageIcon("images/whiteSpot.png").getImage();
+    private static final Image imageBlack = new ImageIcon("images/blackSpot.png").getImage();
 
-    final int color;
+    private final int color;
 
     public Field(int color) {
         this.color = color;

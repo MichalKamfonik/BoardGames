@@ -107,14 +107,10 @@ class DraughtsBoard extends Board {
         figures.put(move.to, moved); // Map moved-figure correctly
         moved.moveTo(move.to);       // Update position in moved-figure
 
-        captureFigure(move.captured);
+        if(move.captured != null) {     // remove captured figure from board;
+            figures.remove(move.captured.getPos());
+        }
         return moved;
-    }
-
-    private Figure captureFigure(Figure captured) {
-        if(captured != null) {
-            return figures.remove(captured.getPos());
-        } else return null;
     }
 
     @Override
@@ -131,16 +127,12 @@ class DraughtsBoard extends Board {
                 figures.add(figure);
             }
         });
-
         return figures;
     }
+
     @Override
     public List<Figure> getFigures(){
-        List<Figure> figures = new LinkedList<>();
-
-        this.figures.forEach((position, figure) -> figures.add(figure));
-
-        return figures;
+        return new LinkedList<>(figures.values());
     }
 
     public Board deepClone() {
@@ -152,19 +144,21 @@ class DraughtsBoard extends Board {
         List<Move> moves = new LinkedList<>();
         boolean capturePossible = false;
 
-        this.figures.forEach((position, figure) -> {
+        for (Figure figure : figures.values()) {
             if(figure.getTeam() == team) {
-                moves.addAll(figure.getMoves(this));
+                List<Move> figureMoves = figure.getMoves(this);
+                boolean capture = figureMoves.stream().anyMatch((m) -> (m.captured != null));
+                if(!capturePossible){   // if none of previous figures could capture
+                    if(capture){        // if this figure can capture
+                        moves.clear();  // remove all previous moves without capture
+                        capturePossible = true; // ignore all next moves without capture
+                    }
+                    moves.addAll(figureMoves);  // add all moves for current figure
+                } else if(capture) {
+                    // if any capture possible add moves of this figures only if it also can capture
+                    moves.addAll(figureMoves);
+                }
             }
-        });
-        for (Move move : moves) {
-            if(move.captured != null){
-                capturePossible = true;
-                break;
-            }
-        }
-        if(capturePossible) {
-            moves.removeIf((move)->move.captured==null);
         }
         return moves;
     }

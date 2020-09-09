@@ -94,14 +94,17 @@ public class BoardGames extends JFrame {
 
             playerComboBox.addActionListener(e -> {
                 JComboBox<Player> comboBox = (JComboBox<Player>)e.getSource();
-                players[number-1].playerChanged();
-                players[number-1] = (Player) comboBox.getSelectedItem();
-                players[number-1].initInfoPanel();
+                Player newPlayer = (Player) comboBox.getSelectedItem();
+                if(newPlayer != players[number-1]) {
+                    players[number - 1].playerChanged();
+                    players[number - 1] = newPlayer;
+                    players[number - 1].initInfoPanel();
+                }
             });
             
             layout.setHorizontalGroup(layout.createSequentialGroup()
                     .addComponent(nameLabel,60,60,60)
-                    .addComponent(playerComboBox,60,60,60)
+                    .addComponent(playerComboBox,70,70,70)
             );
             layout.setVerticalGroup(layout.createParallelGroup()
                     .addComponent(nameLabel,20,20,20)
@@ -153,9 +156,18 @@ public class BoardGames extends JFrame {
         }
     }
 
-    public void captureFigure(int number,Figure captured){
+    public void captureFigure(Player player,Figure captured){
         if(captured != null) {
-            pPlayer[number].captureFigure(captured);
+            int playerNumber = -1;
+            for (int i = 0; i < players.length; i++) {
+                if(player == players[i]){
+                    playerNumber=i;
+                    break;
+                }
+            }
+            if(playerNumber >= 0) {
+                pPlayer[playerNumber].captureFigure(captured);
+            }
         }
     }
     
