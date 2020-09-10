@@ -23,7 +23,7 @@ public class BoardGames extends JFrame {
     /**
      * Default Field size
      */
-    private static final int FIELD_SIZE = 30;
+    static final int FIELD_SIZE = 30;   // to be changed to private after moving mouse listener to BoardGames class
     /**
      * Content Pane reference
      *
