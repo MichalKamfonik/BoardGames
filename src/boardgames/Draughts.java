@@ -14,6 +14,11 @@ class Draughts extends Game {
     }
 
     @Override
+    public String toString() {
+        return "Draughts";
+    }
+
+    @Override
     public void run() {
         int round = 0;
 
@@ -50,7 +55,6 @@ class Draughts extends Game {
                 break;
             }
         }
-        System.exit(0);
     }
 
     /**

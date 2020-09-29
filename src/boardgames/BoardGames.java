@@ -34,18 +34,22 @@ public class BoardGames extends JFrame {
      */
     private final Player[] players = new Player[2];
     /**
+     * Available games array
+     */
+    private final Game[] availableGames = new Game[1];
+    /**
      * Chosen Board game
      */
-    private final Game chosenGame = new Draughts(this,players); // !!!! to be changed
-    private final Board chosenBoard = chosenGame.getBoard();        // !!!! to be changed
+    private Game chosenGame;
+    private Board chosenBoard;
     /**
      * Panel for showing The Board
      */
-    private final JPanel pBoard = new BoardPanel();
+    private final JPanel pBoard;
     /**
      * Panel for showing Player One
      */
-    private final PlayerPanel[] pPlayer = {new PlayerPanel(1),new PlayerPanel(2)}; //!!!! to be changed
+    private final PlayerPanel[] pPlayer;
     /**
      * Method initializing all the panels in the window
      */
@@ -94,6 +98,13 @@ public class BoardGames extends JFrame {
         this.setSize(Frame_W, Frame_H);
         this.setLocation((width-Frame_W)/2, (height-Frame_H)/2);    // place the window in center of screen
 
+        availableGames[0] = new Draughts(this,players);
+        new ChooseGameDialog().setVisible(true);
+        pBoard = new BoardPanel();
+        pPlayer = new PlayerPanel[2];
+        pPlayer[0] = new PlayerPanel(1);
+        pPlayer[1] = new PlayerPanel(2);
+
         InitComponents();
         //this.pack();      // does not look good
     }
@@ -125,6 +136,7 @@ public class BoardGames extends JFrame {
             playerComboBox.addActionListener(e -> {
                 @SuppressWarnings("unchecked")
                 JComboBox<Player> comboBox = (JComboBox<Player>)e.getSource();
+                comboBox.setEditable(false);
                 Player newPlayer = (Player) comboBox.getSelectedItem();
                 if(newPlayer != players[number-1]) {        // ignore if the same player was selected
                     players[number - 1].playerChanged();    // notify player - to interrupt current task
@@ -233,9 +245,43 @@ public class BoardGames extends JFrame {
         JOptionPane.showMessageDialog(null,s);
     }
 
+    private class ChooseGameDialog extends JDialog{
+        public ChooseGameDialog() {
+            super(BoardGames.this, "Choose game", true);
+            this.setDefaultCloseOperation(this.DISPOSE_ON_CLOSE);
+
+            int width = Toolkit.getDefaultToolkit().getScreenSize().width;
+            int height = Toolkit.getDefaultToolkit().getScreenSize().height;
+            this.setSize(Frame_W/2, Frame_H/2);
+            this.setLocation((width-Frame_W/2)/4, (height-Frame_H/2)/4);    // place the window in center of screen
+
+            this.InitComponents();
+            this.pack();
+        }
+        private void InitComponents(){
+            JPanel comboBoxPanel = new JPanel();
+            JPanel buttonPanel = new JPanel();
+            JComboBox<Game> gameSelector = new JComboBox<>(availableGames);
+            gameSelector.setEditable(false);
+            gameSelector.addActionListener(e -> {
+                    chosenGame = (Game)((JComboBox<Game>)e.getSource()).getSelectedItem();
+                    chosenBoard = chosenGame.getBoard();
+            });
+            JButton select = new JButton("OK");
+            select.addActionListener(e -> this.dispose());
+
+            comboBoxPanel.add(gameSelector);
+            buttonPanel.add(select);
+
+            this.add(comboBoxPanel,BorderLayout.NORTH);
+            this.add(buttonPanel,BorderLayout.SOUTH);
+        }
+    }
+
     public static void main(String[] args) {
         EventQueue.invokeLater( () -> {     // give the control to GUI thread
             BoardGames bG = new BoardGames();
+
             bG.setVisible(true);
 
             Thread game = new Thread(bG.chosenGame);

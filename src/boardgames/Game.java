@@ -8,5 +8,6 @@ public abstract class Game implements Runnable {
         return board;
     }
     abstract public Figure round(Player player, Board currentBoard, Move move);
+    abstract public String toString();
 }
 
