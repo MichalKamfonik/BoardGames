@@ -5,6 +5,7 @@ import java.util.List;
 class Draughts extends Game {
     private final int[] KingsNoCapture; // table of kings moves without capture - 15 moves each means a draw
     private final BoardGames bG;    // reference to GUI for requesting refresh and showing messages
+    private int currentPlayer;
 
     public Draughts(BoardGames bG, Player[] players) {
         this.bG = bG;
@@ -23,7 +24,7 @@ class Draughts extends Game {
         int round = 0;
 
         while (true) {
-            int currentPlayer = round % players.length;             // current player number
+            currentPlayer = round % players.length;             // current player number
             int otherPlayer = (round + 1) % players.length;         // the other player number
             Player player = players[currentPlayer];                 // current Player
             Player opponent = players[otherPlayer];                 // the other Player
@@ -35,12 +36,16 @@ class Draughts extends Game {
                 move = player.getMove(board,null);
             }
             if (move == null) {                         // if no move possible current player looses
-                bG.showMessage("Player " + (otherPlayer + 1) + ": " + opponent.getName() + " wins!");
+                bG.showEndMessage("Player " + (otherPlayer + 1) + ": " + opponent.getName() + " wins!");
                 break;
             }
             while (move.captured == null && capturePossible(board, player.team)) {
                 bG.showMessage("Capture is obligatory");
                 move = player.getMove(board, null);
+                while (player != players[currentPlayer]) {   // in case that Player was changed while choosing move
+                    player = players[currentPlayer];
+                    move = player.getMove(board,null);
+                }
             }
 
             Figure moved = round(player, board, move);  // execute the move chosen by player
@@ -85,15 +90,22 @@ class Draughts extends Game {
     private void continueCapture(Player player, Board currentBoard, Figure moved) {
         while (capturePossible(currentBoard, moved)) {
             Move move = player.getMove(currentBoard, moved);
-            // continue capture only with the same figure
-            if (move.from.equals(moved.getPos()) && move.captured != null) {
+
+            if(board != currentBoard){ // if only simulation assume that algorithm chooses only valid moves
                 currentBoard.moveFigure(move);
-                if (board == currentBoard) {        // if this is the "official" board and not a simulation
+            } else { // if this is the "official" board and not a simulation player may have been changed or mistaken
+                while (player != players[currentPlayer]) {   // in case that Player was changed while choosing move
+                    player = players[currentPlayer];
+                    move = player.getMove(currentBoard, moved);
+                }
+                // continue capture only with the same figure
+                if (move.from.equals(moved.getPos()) && move.captured != null) {
+                    currentBoard.moveFigure(move);
                     bG.captureFigure(player, move.captured); // view captured figure in removed figures panel
                     bG.repaint();                                   // request GUI refresh
+                } else {
+                    bG.showMessage("Capture is obligatory");
                 }
-            } else {
-                bG.showMessage("Capture is obligatory");
             }
         }
     }
@@ -114,7 +126,7 @@ class Draughts extends Game {
         for (int i : KingsNoCapture) {
             if (i < 15) return false;
         }
-        bG.showMessage("Draw");
+        bG.showEndMessage("Draw");
         return true;
     }
 

@@ -51,6 +51,10 @@ public class BoardGames extends JFrame {
      */
     private final PlayerPanel[] pPlayer;
     /**
+     * Game thread
+     */
+    Thread game;
+    /**
      * Method initializing all the panels in the window
      */
     private void InitComponents(){
@@ -207,9 +211,30 @@ public class BoardGames extends JFrame {
      * Panel for displaying board
      */
     private class BoardPanel extends JPanel {   // class only for overriding paintComponent method
+
+        private boolean gameStarted = false;        // flag for signalizing that game have been started
+
         @Override
         public void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            if(gameStarted){
+                drawBoard(g);
+            }
+        }
 
+        public BoardPanel(){
+            JButton startButton = new JButton("START");
+            startButton.addActionListener(e->{
+                this.remove(startButton);
+                gameStarted = true;
+                repaint();
+                game = new Thread(chosenGame);
+                game.start();
+            });
+            this.add(startButton);
+        }
+
+        private void drawBoard(Graphics g) {
             int maxX = chosenBoard.getMaxX();   // number of columns
             int maxY = chosenBoard.getMaxY();   // number of rows
             int offsetX = (this.getBounds().width - FIELD_SIZE*maxX)/2;     // position of board in the panel
@@ -246,6 +271,22 @@ public class BoardGames extends JFrame {
         JOptionPane.showMessageDialog(null,s);
     }
 
+    public void showEndMessage(String s) {
+        int option = JOptionPane.showOptionDialog(null,s,"Game Over",JOptionPane.DEFAULT_OPTION,
+                JOptionPane.QUESTION_MESSAGE,null,new String[]{"New game","Exit"},null);
+        if(option == 0){
+            this.dispose();
+            newGame();
+        } else if(option == 1 || option == -1){
+            System.exit(0);
+        }
+    }
+
+    private static void newGame(){
+        BoardGames bG = new BoardGames();
+        bG.setVisible(true);
+    }
+
     private class ChooseGameDialog extends JDialog{
         public ChooseGameDialog() {
             super(BoardGames.this, "Choose game", true);
@@ -264,10 +305,14 @@ public class BoardGames extends JFrame {
             JPanel buttonPanel = new JPanel();
             JComboBox<Game> gameSelector = new JComboBox<>(availableGames);
             gameSelector.setEditable(false);
+            chosenGame = (Game) gameSelector.getSelectedItem();     // select first game as default
+            chosenBoard = chosenGame.getBoard();                    // select first game as default
+
             gameSelector.addActionListener(e -> {
-                    chosenGame = (Game)((JComboBox<Game>)e.getSource()).getSelectedItem();
+                    chosenGame = (Game)((JComboBox<Game>) e.getSource()).getSelectedItem();
                     chosenBoard = chosenGame.getBoard();
             });
+
             JButton select = new JButton("OK");
             select.addActionListener(e -> this.dispose());
 
@@ -280,13 +325,7 @@ public class BoardGames extends JFrame {
     }
 
     public static void main(String[] args) {
-        EventQueue.invokeLater( () -> {     // give the control to GUI thread
-            BoardGames bG = new BoardGames();
-
-            bG.setVisible(true);
-
-            Thread game = new Thread(bG.chosenGame);
-            game.start();
-        });
+        // give the control to GUI thread
+        EventQueue.invokeLater(BoardGames::newGame);
     }
 }
