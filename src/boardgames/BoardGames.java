@@ -99,6 +99,7 @@ public class BoardGames extends JFrame {
         this.setLocation((width-Frame_W)/2, (height-Frame_H)/2);    // place the window in center of screen
 
         availableGames[0] = new Draughts(this,players);
+        // ask user for chosen game, has to be done before initialization of BoardPanel and PlayerPanel
         new ChooseGameDialog().setVisible(true);
         pBoard = new BoardPanel();
         pPlayer = new PlayerPanel[2];
