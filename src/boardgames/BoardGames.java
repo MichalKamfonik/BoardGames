@@ -51,10 +51,6 @@ public class BoardGames extends JFrame {
      */
     private final PlayerPanel[] pPlayer;
     /**
-     * Game thread
-     */
-    Thread game;
-    /**
      * Method initializing all the panels in the window
      */
     private void InitComponents(){
@@ -75,6 +71,18 @@ public class BoardGames extends JFrame {
                 .addComponent(pBoard)
                 .addComponent(pPlayer[1])
         );
+
+        JMenuBar menuBar = new JMenuBar();
+        JMenu menu = new JMenu("File");
+        JMenuItem newGame = new JMenuItem("New Game");
+        newGame.addActionListener(e->{
+            chosenGame.stop();
+            this.dispose();
+            BoardGames.newGame();
+        });
+        menu.add(newGame);
+        menuBar.add(menu);
+        this.setJMenuBar(menuBar);
     }
     public void captureFigure(Player player,Figure captured){
         if(captured != null) {
@@ -228,7 +236,7 @@ public class BoardGames extends JFrame {
                 this.remove(startButton);
                 gameStarted = true;
                 repaint();
-                game = new Thread(chosenGame);
+                Thread game = new Thread(chosenGame);
                 game.start();
             });
             this.add(startButton);
@@ -275,6 +283,7 @@ public class BoardGames extends JFrame {
         int option = JOptionPane.showOptionDialog(null,s,"Game Over",JOptionPane.DEFAULT_OPTION,
                 JOptionPane.QUESTION_MESSAGE,null,new String[]{"New game","Exit"},null);
         if(option == 0){
+            chosenGame.stop();
             this.dispose();
             newGame();
         } else if(option == 1 || option == -1){

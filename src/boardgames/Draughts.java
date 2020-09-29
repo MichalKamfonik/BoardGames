@@ -22,8 +22,9 @@ class Draughts extends Game {
     @Override
     public void run() {
         int round = 0;
+        running = true;
 
-        while (true) {
+        while (running) {
             currentPlayer = round % players.length;             // current player number
             int otherPlayer = (round + 1) % players.length;         // the other player number
             Player player = players[currentPlayer];                 // current Player

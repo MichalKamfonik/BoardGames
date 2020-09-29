@@ -68,7 +68,7 @@ public class User extends Player {
             try {
                 Thread.sleep(10); // !!!!waiting for player to click - busy waiting - to be changed
             } catch (InterruptedException ex) {
-                ex.printStackTrace();
+                Thread.currentThread().interrupt();
             }
         }
         if (playerChanged){         // some cleaning if the player was changed
