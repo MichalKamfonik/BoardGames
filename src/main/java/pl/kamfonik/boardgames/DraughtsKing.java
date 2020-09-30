@@ -5,10 +5,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 class DraughtsKing extends Figure {
-    private static final ImageIcon imageBlack = new ImageIcon("src/main/resources/images/blackKing.png");
-    private static final ImageIcon imageWhite = new ImageIcon("src/main/resources/images/whiteKing.png");
-    private static final ImageIcon imageBlackPicked = new ImageIcon("src/main/resources/images/blackKingP.png");
-    private static final ImageIcon imageWhitePicked = new ImageIcon("src/main/resources/images/whiteKingP.png");
+    private static final ImageIcon imageBlack = new ImageIcon(DraughtsKing.class.getResource("/images/blackKing.png"));
+    private static final ImageIcon imageWhite = new ImageIcon(DraughtsKing.class.getResource("/images/whiteKing.png"));
+    private static final ImageIcon imageBlackPicked = new ImageIcon(DraughtsKing.class.getResource("/images/blackKingP.png"));
+    private static final ImageIcon imageWhitePicked = new ImageIcon(DraughtsKing.class.getResource("/images/whiteKingP.png"));
 
     private static final int KING_VALUE = 5;
 

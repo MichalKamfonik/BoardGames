@@ -3,9 +3,8 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <groupId>pl.kamfonik</groupId>
-    <artifactId>BoardGames</artifactId>
+    <artifactId>board-games</artifactId>
     <version>1.0-SNAPSHOT</version>
     <properties>
         <maven.compiler.target>14</maven.compiler.target>
@@ -15,7 +14,6 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>3.0.0</version>
                 <configuration>
@@ -31,5 +29,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

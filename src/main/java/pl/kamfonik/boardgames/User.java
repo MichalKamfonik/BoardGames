@@ -22,7 +22,7 @@ public class User extends Player {
 
     public User(JPanel infoPanel,JPanel boardPanel, int team) {
         playerName = "User";
-        userIcon = new ImageIcon(new ImageIcon("images/borysek.jpg")
+        userIcon = new ImageIcon(new ImageIcon(getClass().getResource("/images/borysek.jpg"))
                 .getImage().getScaledInstance(100, -1, Image.SCALE_DEFAULT)); // !!!!to be changed
         this.team = team;
         this.infoPanel = infoPanel;
