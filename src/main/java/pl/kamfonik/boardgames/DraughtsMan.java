@@ -1,14 +1,14 @@
-package boardgames;
+package pl.kamfonik.boardgames;
 
 import javax.swing.*;
 import java.util.LinkedList;
 import java.util.List;
 
 class DraughtsMan extends Figure {
-    private static final ImageIcon imageBlack = new ImageIcon("images/black.png");
-    private static final ImageIcon imageWhite = new ImageIcon("images/white.png");
-    private static final ImageIcon imageBlackPicked = new ImageIcon("images/blackP.png");
-    private static final ImageIcon imageWhitePicked = new ImageIcon("images/whiteP.png");
+    private static final ImageIcon imageBlack = new ImageIcon("src/main/resources/images/black.png");
+    private static final ImageIcon imageWhite = new ImageIcon("src/main/resources/images/white.png");
+    private static final ImageIcon imageBlackPicked = new ImageIcon("src/main/resources/images/blackP.png");
+    private static final ImageIcon imageWhitePicked = new ImageIcon("src/main/resources/images/whiteP.png");
 
     private static final int MAN_VALUE = 1;
 

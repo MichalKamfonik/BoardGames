@@ -1,14 +1,14 @@
-package boardgames;
+package pl.kamfonik.boardgames;
 
 import javax.swing.*;
 import java.util.LinkedList;
 import java.util.List;
 
 class DraughtsKing extends Figure {
-    private static final ImageIcon imageBlack = new ImageIcon("images/blackKing.png");
-    private static final ImageIcon imageWhite = new ImageIcon("images/whiteKing.png");
-    private static final ImageIcon imageBlackPicked = new ImageIcon("images/blackKingP.png");
-    private static final ImageIcon imageWhitePicked = new ImageIcon("images/whiteKingP.png");
+    private static final ImageIcon imageBlack = new ImageIcon("src/main/resources/images/blackKing.png");
+    private static final ImageIcon imageWhite = new ImageIcon("src/main/resources/images/whiteKing.png");
+    private static final ImageIcon imageBlackPicked = new ImageIcon("src/main/resources/images/blackKingP.png");
+    private static final ImageIcon imageWhitePicked = new ImageIcon("src/main/resources/images/whiteKingP.png");
 
     private static final int KING_VALUE = 5;
 

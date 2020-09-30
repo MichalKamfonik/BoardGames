@@ -1,4 +1,4 @@
-package boardgames;
+package pl.kamfonik.boardgames;
 
 import java.util.List;
 

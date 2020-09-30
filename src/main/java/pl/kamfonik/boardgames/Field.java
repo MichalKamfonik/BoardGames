@@ -1,4 +1,4 @@
-package boardgames;
+package pl.kamfonik.boardgames;
 
 import javax.swing.*;
 import java.awt.*;
@@ -6,8 +6,8 @@ import java.awt.*;
 public class Field {
     public static final int WHITE = 0;
     public static final int BLACK = 1;
-    private static final Image imageWhite = new ImageIcon("images/whiteSpot.png").getImage();
-    private static final Image imageBlack = new ImageIcon("images/blackSpot.png").getImage();
+    private static final Image imageWhite = new ImageIcon("src/main/resources/images/whiteSpot.png").getImage();
+    private static final Image imageBlack = new ImageIcon("src/main/resources/images/blackSpot.png").getImage();
 
     private final int color;
 

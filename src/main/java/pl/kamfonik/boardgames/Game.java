@@ -1,4 +1,4 @@
-package boardgames;
+package pl.kamfonik.boardgames;
 
 public abstract class Game implements Runnable {
     protected Player[] players;

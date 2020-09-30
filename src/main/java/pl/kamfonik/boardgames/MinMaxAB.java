@@ -1,4 +1,4 @@
-package boardgames;
+package pl.kamfonik.boardgames;
 
 import javax.swing.*;
 import java.util.*;
