@@ -7,7 +7,6 @@
     <groupId>pl.kamfonik</groupId>
     <artifactId>BoardGames</artifactId>
     <version>1.0-SNAPSHOT</version>
-
     <properties>
         <maven.compiler.target>14</maven.compiler.target>
         <maven.compiler.source>14</maven.compiler.source>
@@ -16,6 +15,7 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>3.0.0</version>
                 <configuration>
@@ -31,4 +31,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>
