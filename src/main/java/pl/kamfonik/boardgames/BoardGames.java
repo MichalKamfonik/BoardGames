@@ -274,7 +274,7 @@ public class BoardGames extends JFrame {
                 );  // draw all figures on the panel
             }
             catch(ConcurrentModificationException e) {
-                log.debug(e.getStackTrace());
+                e.getStackTrace();
             }
         }
     }
