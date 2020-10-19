@@ -51,7 +51,10 @@ public class User extends Player {
 
     @Override
     void playerChanged() {
-        playerChanged = true;
+        synchronized (this){
+            playerChanged = true;
+            notify();
+        }
     }
 
     @Override
@@ -63,20 +66,22 @@ public class User extends Player {
 
         if (!movePossible()) return null;
 
-        // wait until the move has been chosen or player was changed
-        while (nextMove == null && !playerChanged) {
+        synchronized (this){
+            // wait until the move has been chosen or player was changed
             try {
-                Thread.sleep(10); // !!!!waiting for player to click - busy waiting - to be changed
+                while (nextMove == null && !playerChanged){
+                    wait();
+                }
+                if (playerChanged){         // some cleaning if the player was changed
+                    clearMove();
+                    nextMove = null;
+                    playerChanged = false; // clear the flag just in case (not necessary)
+                }
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }
+            return nextMove;
         }
-        if (playerChanged){         // some cleaning if the player was changed
-            clearMove();
-            nextMove = null;
-            playerChanged = false; // clear the flag just in case (not necessary)
-        }
-        return nextMove;
     }
 
     private boolean movePossible() {
@@ -160,12 +165,15 @@ public class User extends Player {
         }
 
         private void finishMove(Position pos) {
-            for (Move m : moves) {      // check if chosen move belongs to valid moves
-                if (m.from.equals(picked.getPos()) && m.to.equals(pos)) {
-                    clearMove();        // do some cleaning in temporary values
-                    nextMove = m;       // return chosen move (getMove(...) is waiting for setting this value)
-                    break;
+            synchronized (User.this) {
+                for (Move m : moves) {      // check if chosen move belongs to valid moves
+                    if (m.from.equals(picked.getPos()) && m.to.equals(pos)) {
+                        clearMove();        // do some cleaning in temporary values
+                        nextMove = m;       // return chosen move (getMove(...) is waiting for setting this value)
+                        break;
+                    }
                 }
+                User.this.notify();
             }
         }
     }
