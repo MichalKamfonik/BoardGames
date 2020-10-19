@@ -1,5 +1,8 @@
 package pl.kamfonik.boardgames;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.awt.*;
 import java.util.ConcurrentModificationException;
 import javax.swing.*;
@@ -12,6 +15,7 @@ import javax.swing.border.EtchedBorder;
  * @version 0.1 06-09-2020
  */
 public class BoardGames extends JFrame {
+    public static final Logger log = LogManager.getLogger(BoardGames.class);
     /**
      * Default Height of the window
      */
@@ -269,8 +273,8 @@ public class BoardGames extends JFrame {
                                 null)
                 );  // draw all figures on the panel
             }
-            catch(ConcurrentModificationException e) {  // !!!! need to synchronize the method with game thread
-                e.printStackTrace();
+            catch(ConcurrentModificationException e) {
+                log.debug(e.getStackTrace());
             }
         }
     }
