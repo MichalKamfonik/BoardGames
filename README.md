@@ -2,14 +2,14 @@
 
 Graphic desktop application for playing Boardgames.
 
-The app has implemented Droughts and Min-Max algorithm for the computer 
+The app has implemented Draughts and Min-Max algorithm for the computer 
 but is ready for adding more games, player types and algorithms.
 
 ## What for?
 BoardGames provides Swing graphic interface for creating and playing 
 Boardgames.
 
-Without any additions you can play Droughts game against your friends on the same 
+Without any additions you can play Draughts game against your friends on the same 
 desktop or against the computer with 1 of 10 available difficulty levels.
 
 If you want you can write and add your own games (e.g. chess), players (e.g. online) and 
