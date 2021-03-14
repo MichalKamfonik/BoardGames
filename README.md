@@ -14,10 +14,10 @@ desktop or against the computer with 1 of 10 available difficulty levels.
 
 If you want you can write and add your own games (e.g. chess), players (e.g. online) and 
 AI algorithms (e.g. A*) using provided abstract classes:
-* 'Board'
-* 'Figure'
-* 'Game'
-* 'Player'
+* Board
+* Figure
+* Game
+* Player
 
 ## How does it work?
 1. Clone repository and build the app or download 
